@@ -1,0 +1,6 @@
+{
+  "name": "Musa Mobile Repairing Center",
+  "description": "Professional Mobile Repairing & Shop Management System - موسی موبائل ریپیئرنگ سینٹر",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

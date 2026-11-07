@@ -1,0 +1,43 @@
+{
+  "packageId": "com.musamobile.repairing",
+  "host": "musa-mobile-repairing.app",
+  "name": "MUSA MOBILE REPAIRING CENTER",
+  "launcherName": "Musa Mobile",
+  "themeColor": "#030b1e",
+  "navigationColor": "#030b1e",
+  "backgroundColor": "#030b1e",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "/icon.svg",
+  "maskableIconUrl": "/pwa-512x512.png",
+  "appVersionName": "2.0.0",
+  "appVersionCode": 2,
+  "shortcuts": [
+    {
+      "name": "New Repair Entry",
+      "short_name": "New Job",
+      "url": "/?view=newRepair",
+      "icon": "/icon.svg"
+    },
+    {
+      "name": "Job Cards Registry",
+      "short_name": "Job Cards",
+      "url": "/?view=jobCards",
+      "icon": "/icon.svg"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  }
+}

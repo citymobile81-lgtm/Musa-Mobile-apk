@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="goldOuterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff5b8" />
+      <stop offset="35%" stop-color="#d4af37" />
+      <stop offset="70%" stop-color="#997819" />
+      <stop offset="100%" stop-color="#ffd700" />
+    </linearGradient>
+    <linearGradient id="goldInnerGrad" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe58f" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#7a5c12" />
+    </linearGradient>
+    <radialGradient id="centerNavyRadial" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0c2d6b" />
+      <stop offset="60%" stop-color="#030b1e" />
+      <stop offset="100%" stop-color="#020713" />
+    </radialGradient>
+    <linearGradient id="cyanTechGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <path id="topLogoArc" d="M 75 250 A 175 175 0 0 1 425 250" fill="none" />
+    <path id="bottomLogoArc" d="M 425 250 A 175 175 0 0 1 75 250" fill="none" />
+  </defs>
+
+  <!-- Outer Circular Edge -->
+  <circle cx="250" cy="250" r="242" fill="#020713" stroke="url(#goldOuterGrad)" stroke-width="7" />
+  <circle cx="250" cy="250" r="230" fill="none" stroke="url(#goldInnerGrad)" stroke-width="2.5" stroke-dasharray="5 5" />
+  <circle cx="250" cy="250" r="198" fill="#030b1e" stroke="url(#goldOuterGrad)" stroke-width="5.5" />
+
+  <text font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="21" font-weight="900" fill="url(#goldOuterGrad)" letter-spacing="3">
+    <textPath href="#topLogoArc" startOffset="50%" text-anchor="middle">
+      ★ MUSA MOBILE REPAIRING CENTER ★
+    </textPath>
+  </text>
+  <text font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="19" font-weight="800" fill="#ffffff" letter-spacing="3.5">
+    <textPath href="#bottomLogoArc" startOffset="50%" text-anchor="middle">
+      ★ 03006861765 ★ MUZAFFARGARH ★
+    </textPath>
+  </text>
+
+  <circle cx="250" cy="250" r="158" fill="url(#centerNavyRadial)" stroke="url(#goldOuterGrad)" stroke-width="4.5" />
+  <circle cx="250" cy="250" r="148" fill="none" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.8" />
+
+  <g transform="translate(250, 136)">
+    <text text-anchor="middle" font-family="'Noto Nastaliq Urdu', serif" font-size="21" font-weight="bold" fill="#ffe58f">
+      موسی موبائل ریپیئرنگ سینٹر
+    </text>
+  </g>
+
+  <!-- Central High-Tech Smartphone -->
+  <rect x="204" y="176" width="92" height="150" rx="16" fill="#020817" stroke="url(#goldOuterGrad)" stroke-width="4" />
+  <rect x="212" y="190" width="76" height="122" rx="9" fill="#04122d" stroke="#0052a3" stroke-width="1.5" />
+  <rect x="238" y="181" width="24" height="3" rx="1.5" fill="#e2e8f0" />
+  <circle cx="230" cy="182.5" r="1.5" fill="#38bdf8" />
+
+  <!-- Diagnostics Gear in Core -->
+  <g transform="translate(250, 251)">
+    <circle cx="0" cy="0" r="28" stroke="url(#cyanTechGlow)" stroke-width="3.2" fill="none" stroke-dasharray="7 5" />
+    <circle cx="0" cy="0" r="16" stroke="url(#goldOuterGrad)" stroke-width="2" fill="none" />
+    <circle cx="0" cy="0" r="6" fill="#d4af37" />
+  </g>
+
+  <!-- Crossed Screwdriver & Wrench -->
+  <g transform="translate(250, 251) rotate(45)">
+    <path d="M -56 0 L 56 0" stroke="#f8fafc" stroke-width="5.5" stroke-linecap="round" />
+    <rect x="18" y="-6" width="38" height="12" rx="3" fill="url(#goldOuterGrad)" stroke="#7a5c12" stroke-width="1.5" />
+    <path d="M -63 -3.5 L -56 0 L -63 3.5 Z" fill="#94a3b8" />
+  </g>
+  <g transform="translate(250, 251) rotate(-45)">
+    <path d="M -52 0 L 52 0" stroke="url(#goldOuterGrad)" stroke-width="5" stroke-linecap="round" />
+    <circle cx="-42" cy="0" r="11" fill="#030b1e" stroke="url(#goldOuterGrad)" stroke-width="3.5" />
+    <circle cx="42" cy="0" r="11" fill="#030b1e" stroke="url(#goldOuterGrad)" stroke-width="3.5" />
+  </g>
+
+  <!-- Bottom 20 Years Service Ribbon -->
+  <g transform="translate(250, 355)">
+    <path d="M -115 -13 L 115 -13 L 105 13 L -105 13 Z" fill="#020817" stroke="url(#goldOuterGrad)" stroke-width="2" />
+    <text y="5" text-anchor="middle" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="11" font-weight="900" fill="#ffe58f" letter-spacing="1.5">
+      20 YEARS SERVICE • ORIGINAL PARTS
+    </text>
+  </g>
+</svg>

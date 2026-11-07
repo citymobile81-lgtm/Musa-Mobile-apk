@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <!-- Metallic Gold Gradients -->
+    <linearGradient id="goldOuterRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff5b8" />
+      <stop offset="30%" stop-color="#d4af37" />
+      <stop offset="70%" stop-color="#997819" />
+      <stop offset="100%" stop-color="#ffd700" />
+    </linearGradient>
+
+    <linearGradient id="goldInnerRing" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe58f" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#7a5c12" />
+    </linearGradient>
+
+    <!-- Deep Navy Radial Gradients -->
+    <radialGradient id="centerNavyGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0a2558" />
+      <stop offset="60%" stop-color="#030b1e" />
+      <stop offset="100%" stop-color="#020713" />
+    </radialGradient>
+
+    <linearGradient id="cyanTech" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <!-- Drop Shadows and Glow -->
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Circular Paths for Text along Curve -->
+    <!-- Top Arc Path for English Text -->
+    <path id="topTextArc" d="M 65 250 A 185 185 0 0 1 435 250" fill="none" />
+    <!-- Bottom Arc Path for Urdu / Phone Text -->
+    <path id="bottomTextArc" d="M 435 250 A 185 185 0 0 1 65 250" fill="none" />
+  </defs>
+
+  <!-- Outer Ring Shadow -->
+  <circle cx="250" cy="250" r="242" fill="#020713" stroke="url(#goldOuterRing)" stroke-width="8" filter="url(#goldGlow)" />
+
+  <!-- Outer Decorative Beaded Border -->
+  <circle cx="250" cy="250" r="230" fill="none" stroke="url(#goldInnerRing)" stroke-width="2.5" stroke-dasharray="6 6" />
+
+  <!-- Outer Dark Ring Ribbon (Houses Business Name) -->
+  <circle cx="250" cy="250" r="200" fill="#030b1e" stroke="url(#goldOuterRing)" stroke-width="6" />
+
+  <!-- TEXT ALONG CIRCLE: Top Arc - MUSA MOBILE REPAIRING CENTER -->
+  <text font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="21" font-weight="900" fill="url(#goldOuterRing)" letter-spacing="3.2">
+    <textPath href="#topTextArc" startOffset="50%" text-anchor="middle">
+      ★ MUSA MOBILE REPAIRING CENTER ★
+    </textPath>
+  </text>
+
+  <!-- TEXT ALONG CIRCLE: Bottom Arc - PHONE & CITY -->
+  <text font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="19" font-weight="800" fill="#ffffff" letter-spacing="3.5">
+    <textPath href="#bottomTextArc" startOffset="50%" text-anchor="middle">
+      ★ 03006861765 ★ MUZAFFARGARH ★
+    </textPath>
+  </text>
+
+  <!-- Inner Gold Beveled Ring -->
+  <circle cx="250" cy="250" r="160" fill="url(#centerNavyGlow)" stroke="url(#goldOuterRing)" stroke-width="5" />
+
+  <!-- Decorative Inner Ring -->
+  <circle cx="250" cy="250" r="150" fill="none" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.8" />
+
+  <!-- Inner Urdu Top Banner -->
+  <g transform="translate(250, 135)">
+    <text text-anchor="middle" font-family="'Noto Nastaliq Urdu', serif" font-size="20" font-weight="bold" fill="#ffe58f" letter-spacing="1">
+      موسی موبائل ریپیئرنگ سینٹر
+    </text>
+    <text y="20" text-anchor="middle" font-family="'Noto Nastaliq Urdu', serif" font-size="12" fill="#94a3b8">
+      پروپرائٹر: میاں اظہر قریشی
+    </text>
+  </g>
+
+  <!-- Core Diagnostics & Repair Emblem -->
+  <!-- Microchip Traces -->
+  <g stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" opacity="0.6">
+    <path d="M 170 230 H 200 L 215 245" fill="none"/>
+    <circle cx="170" cy="230" r="3" fill="#38bdf8"/>
+    <path d="M 330 230 H 300 L 285 245" fill="none"/>
+    <circle cx="330" cy="230" r="3" fill="#38bdf8"/>
+    <path d="M 170 270 H 200 L 215 255" fill="none"/>
+    <circle cx="170" cy="270" r="3" fill="#38bdf8"/>
+    <path d="M 330 270 H 300 L 285 255" fill="none"/>
+    <circle cx="330" cy="270" r="3" fill="#38bdf8"/>
+  </g>
+
+  <!-- Central Smartphone Body -->
+  <rect x="205" y="175" width="90" height="150" rx="16" fill="#020817" stroke="url(#goldOuterRing)" stroke-width="4" filter="url(#goldGlow)" />
+  <!-- Smartphone Screen -->
+  <rect x="213" y="190" width="74" height="120" rx="9" fill="#04122d" stroke="#0052a3" stroke-width="1.5" />
+  <!-- Ear Speaker & Cam -->
+  <rect x="238" y="181" width="24" height="3" rx="1.5" fill="#e2e8f0" />
+  <circle cx="230" cy="182.5" r="1.5" fill="#38bdf8" />
+  <!-- Phone Screen Diagnostics Gear -->
+  <g transform="translate(250, 250)">
+    <circle cx="0" cy="0" r="28" stroke="url(#cyanTech)" stroke-width="3" fill="none" stroke-dasharray="7 5" />
+    <circle cx="0" cy="0" r="16" stroke="url(#goldOuterRing)" stroke-width="2" fill="none" />
+    <circle cx="0" cy="0" r="6" fill="#d4af37" />
+  </g>
+
+  <!-- Crossed Repair Screwdriver & Spudger / Wrench Tools -->
+  <!-- Precision Screwdriver (Top-Left to Bottom-Right) -->
+  <g transform="translate(250, 250) rotate(45)">
+    <path d="M -55 0 L 55 0" stroke="#f1f5f9" stroke-width="5" stroke-linecap="round"/>
+    <rect x="18" y="-6" width="38" height="12" rx="3" fill="url(#goldOuterRing)" stroke="#7a5c12" stroke-width="1.5"/>
+    <path d="M -62 -3 L -55 0 L -62 3 Z" fill="#94a3b8"/>
+  </g>
+  <!-- Calibration Wrench (Top-Right to Bottom-Left) -->
+  <g transform="translate(250, 250) rotate(-45)">
+    <path d="M -50 0 L 50 0" stroke="url(#goldOuterRing)" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="-42" cy="0" r="11" fill="#030b1e" stroke="url(#goldOuterRing)" stroke-width="3.5"/>
+    <circle cx="42" cy="0" r="11" fill="#030b1e" stroke="url(#goldOuterRing)" stroke-width="3.5"/>
+  </g>
+
+  <!-- Bottom Distinction Ribbon Banner -->
+  <g transform="translate(250, 355)">
+    <!-- Golden Ribbon Shape -->
+    <path d="M -115 -14 L 115 -14 L 105 14 L -105 14 Z" fill="#020817" stroke="url(#goldOuterRing)" stroke-width="2" />
+    <text y="5" text-anchor="middle" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="11" font-weight="900" fill="#ffe58f" letter-spacing="1.5">
+      20 YEARS SERVICE • ORIGINAL PARTS
+    </text>
+  </g>
+
+  <g transform="translate(250, 385)">
+    <text text-anchor="middle" font-family="'Noto Nastaliq Urdu', serif" font-size="12" font-weight="bold" fill="#38bdf8">
+      موبائل ریپیئرنگ • ہول سیل پارٹس • ایکسیسریز
+    </text>
+  </g>
+</svg>
