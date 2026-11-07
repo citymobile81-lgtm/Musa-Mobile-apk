@@ -32,13 +32,10 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Set up Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Node Dependencies
