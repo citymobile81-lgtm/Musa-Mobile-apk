@@ -7,6 +7,22 @@
   [dir="ltr"] {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
+
+  /* Mobile touch & input keyboard optimizations */
+  input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="email"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 }
 
 /* ========================================================
