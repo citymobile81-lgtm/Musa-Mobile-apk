@@ -228,6 +228,7 @@ export interface ShopSettings {
   selectedLocalFolderName?: string;
   mobileCompanies: string[];
   customLogoUrl?: string;
+  customerReceiptNotes?: string;
 }
 
 export interface RepairReminder {

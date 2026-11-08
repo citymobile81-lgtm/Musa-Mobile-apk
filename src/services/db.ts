@@ -16,6 +16,16 @@ import {
 const DB_NAME = 'MusaMobileRepairDB_v2';
 const DB_VERSION = 4;
 
+export const DEFAULT_CUSTOMER_RECEIPT_NOTES = `اہم ہدایات برائے کسٹمر:
+
+1۔ محترم کسٹمر! براہِ کرم اپنا موبائل فون رسید کی تاریخ سے 10 دن کے اندر وصول کر لیں۔ مقررہ مدت کے بعد موبائل فون نہ اٹھانے کی صورت میں دکاندار ذمہ دار نہ ہوگا۔
+
+2۔ موبائل فون کی مرمت کے دوران اگر سیٹ میں پہلے سے موجود کسی خرابی کے علاوہ مزید خرابی پیدا ہو یا کسی اضافی مسئلے کا سامنا ہو تو دکاندار اس کا ذمہ دار نہ ہوگا۔
+
+3۔ موبائل فون وصول کرتے وقت اس کی مکمل چیکنگ کر لیں اور اپنی موجودگی میں موبائل کی حالت، ڈسپلے، ٹچ، آواز اور دیگر متعلقہ فنکشنز چیک کر لیں۔
+
+4۔ براہِ کرم اپنی رسید محفوظ رکھیں اور موبائل وصول کرتے وقت رسید دکھائیں۔`;
+
 export const DEFAULT_SETTINGS: ShopSettings = {
   shopName: 'MUSA MOBILE REPAIRING CENTER',
   shopUrdu: 'موسی موبائل ریپیئرنگ سنٹر',
@@ -30,6 +40,7 @@ export const DEFAULT_SETTINGS: ShopSettings = {
   creatorTag: 'موسیٰ موبائل ریپیئرنگ سینٹر',
   termsUrdu: '1. ڈیلیوری کے وقت رسید دکھانا لازمی ہے۔ 2. سم یا میموری کارڈ کی دکان ذمہ دار نہ ہوگی۔ 3. 30 دن کے اندر فون وصول فرمائیں۔',
   termsEn: '1. Original receipt required at pickup. 2. Not responsible for unregistered SIM/SD cards. 3. Please claim within 30 days.',
+  customerReceiptNotes: DEFAULT_CUSTOMER_RECEIPT_NOTES,
   googleClientId: localStorage.getItem('musa_gdrive_client_id') || '',
   autoDailyBackupEnabled: true,
   mobileCompanies: [

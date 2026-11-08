@@ -389,18 +389,30 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
             )}
           </div>
 
-          {/* Terms & Conditions */}
-          <div className="text-[9px] text-slate-600 space-y-0.5 leading-tight">
-            <p>1. Receipt required for pickup. 2. Repaired items not claimed within 30 days will be disposed. 3. Warranty valid only for specific repaired parts.</p>
-            <p className="font-serif text-[10px] text-slate-800" dir="rtl">
-              1۔ موبائل کی واپسی کے لیے رسید لازمی ہے۔ 2۔ 30 دن تک وصول نہ کرنے کی صورت میں شاپ ذمہ دار نہ ہوگی۔ 3۔ وارنٹی صرف تبدیل شدہ پارٹ پر لاگو ہے۔
+          {/* CUSTOMER RECEIPT NOTES / رسید کی خصوصی ہدایات */}
+          <div className="text-[9px] text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-300 space-y-1 leading-normal">
+            <p className="font-bold text-[10px] text-slate-900 border-b border-slate-200 pb-0.5">
+              CUSTOMER RECEIPT NOTES / رسید کی خصوصی ہدایات:
             </p>
+            <div className="font-serif text-[9.5px] text-slate-800 whitespace-pre-line leading-relaxed" dir="rtl">
+              {settings.customerReceiptNotes || `اہم ہدایات برائے کسٹمر:
+1۔ محترم کسٹمر! براہِ کرم اپنا موبائل فون رسید کی تاریخ سے 10 دن کے اندر وصول کر لیں۔ مقررہ مدت کے بعد موبائل فون نہ اٹھانے کی صورت میں دکاندار ذمہ دار نہ ہوگا۔
+2۔ موبائل فون کی مرمت کے دوران اگر سیٹ میں پہلے سے موجود کسی خرابی کے علاوہ مزید خرابی پیدا ہو یا کسی اضافی مسئلے کا سامنا ہو تو دکاندار اس کا ذمہ دار نہ ہوگا۔
+3۔ موبائل فون وصول کرتے وقت اس کی مکمل چیکنگ کر لیں اور اپنی موجودگی میں موبائل کی حالت، ڈسپلے، ٹچ، آواز اور دیگر متعلقہ فنکشنز چیک کر لیں۔
+4۔ براہِ کرم اپنی رسید محفوظ رکھیں اور موبائل وصول کرتے وقت رسید دکھائیں۔`}
+            </div>
           </div>
 
-          {/* Bottom Card Signature */}
-          <div className="pt-2 text-center border-t border-slate-200">
-            <p className="text-[11px] font-serif font-bold text-slate-900">
-              "آپ کے اعتماد کا شکریہ، موسی موبائل ریپیئرنگ سنٹر"
+          {/* Bottom Card Gratitude & Dedication */}
+          <div className="pt-2 text-center border-t border-slate-200 space-y-0.5">
+            <p className="text-[11px] font-serif font-bold text-slate-900" dir="rtl">
+              آپ کے اعتماد اور تعاون کا بے حد شکریہ!
+            </p>
+            <p className="text-[9.5px] font-serif text-slate-600" dir="rtl">
+              موسی موبائل ریپیئرنگ سنٹر میں تشریف لانے کا شکریہ۔ ہم ہمیشہ آپ کی بہترین خدمت، معیاری کام اور اطمینان کے لیے کوشاں ہیں۔
+            </p>
+            <p className="text-[10px] font-serif font-bold text-blue-700" dir="rtl">
+              آپ کا اعتماد، ہماری پہچان!
             </p>
           </div>
         </div>

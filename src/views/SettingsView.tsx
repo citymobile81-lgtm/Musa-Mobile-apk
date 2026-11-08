@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShopSettings } from '../types';
-import { saveSettings, logActivity } from '../services/db';
+import { saveSettings, logActivity, DEFAULT_CUSTOMER_RECEIPT_NOTES } from '../services/db';
 import { RotatingLogo } from '../components/RotatingLogo';
 import { LogoManagementSection } from '../components/LogoManagementSection';
 import { UserManagementSection } from '../components/UserManagementSection';
@@ -19,6 +19,8 @@ import {
   Users,
   KeyRound,
   ShieldCheck,
+  FileText,
+  Edit3,
 } from 'lucide-react';
 
 interface SettingsViewProps {
@@ -39,6 +41,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [phone2, setPhone2] = useState(settings.phone2 || '03006861765');
   const [termsUrdu, setTermsUrdu] = useState(settings.termsUrdu || '');
   const [termsEn, setTermsEn] = useState(settings.termsEn || '');
+  const [customerReceiptNotes, setCustomerReceiptNotes] = useState(
+    settings.customerReceiptNotes || DEFAULT_CUSTOMER_RECEIPT_NOTES
+  );
+  const [notesSavedNotice, setNotesSavedNotice] = useState<string | null>(null);
 
   // Mobile Companies Manager
   const [companies, setCompanies] = useState<string[]>(settings.mobileCompanies || []);
@@ -73,17 +79,38 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       phone2: phone2.trim(),
       termsUrdu: termsUrdu.trim(),
       termsEn: termsEn.trim(),
+      customerReceiptNotes: customerReceiptNotes.trim(),
       mobileCompanies: companies,
       customLogoUrl: activeLogo,
     };
 
     await saveSettings(updated);
-    await logActivity('UPDATE_SETTINGS', 'Updated shop branding and system settings');
+    await logActivity('UPDATE_SETTINGS', 'Updated shop branding, receipt notes and system settings');
     onSettingsSaved(updated);
-    alert('Shop configurations and mobile companies updated successfully!');
+    alert('Shop configurations, receipt notes and settings updated successfully!');
   };
 
-  const [activeTab, setActiveTab] = useState<'all' | 'users' | 'logo' | 'general'>('all');
+  const handleSaveNotesOnly = async () => {
+    const updated: ShopSettings = {
+      ...settings,
+      customerReceiptNotes: customerReceiptNotes.trim(),
+    };
+    await saveSettings(updated);
+    await logActivity('UPDATE_RECEIPT_NOTES', 'Saved custom customer receipt notes');
+    onSettingsSaved(updated);
+    setNotesSavedNotice('رسید کی خصوصی ہدایات کامیابی سے محفوظ ہو گئیں! یہ تمام نئی رسیدوں پر خودکار لاگو ہوں گی۔');
+    setTimeout(() => {
+      setNotesSavedNotice(null);
+    }, 4500);
+  };
+
+  const handleResetNotesToDefault = () => {
+    if (confirm('کیا آپ رسید کی خصوصی ہدایات کو اصل ڈیفالٹ پر ری سیٹ کرنا چاہتے ہیں؟')) {
+      setCustomerReceiptNotes(DEFAULT_CUSTOMER_RECEIPT_NOTES);
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState<'all' | 'users' | 'logo' | 'general' | 'notes'>('all');
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -146,6 +173,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           >
             <Store className="w-3.5 h-3.5" />
             <span>Shop Profile (دکان)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('notes')}
+            className={`px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'notes'
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>رسید نوٹس (Notes)</span>
           </button>
         </div>
       </div>
@@ -355,6 +394,76 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
 
+        {/* 4. CUSTOMER RECEIPT NOTES / رسید کی خصوصی ہدایات */}
+        <div className="glass-panel p-5 rounded-2xl space-y-4 text-xs border border-emerald-500/30">
+          <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-2.5 gap-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-emerald-400" />
+              <span>4. CUSTOMER RECEIPT NOTES / رسید کی خصوصی ہدایات</span>
+            </h3>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 font-bold font-serif">
+              واٹس ایپ اور پرنٹ رسید کارڈ
+            </span>
+          </div>
+
+          <p className="text-slate-300 text-[11px] leading-relaxed">
+            یہاں آپ کسٹمر رسید کارڈ پر پرنٹ اور واٹس ایپ ہونے والی اپنی مرضی کی خصوصی شرائط و ہدایات لکھ اور محفوظ کر سکتے ہیں۔ یہ ہدایات ہر نئی کسٹمر رسید پر خودکار طریقے سے شامل ہوں گی۔
+          </p>
+
+          {notesSavedNotice && (
+            <div className="p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-500 text-emerald-200 text-xs font-medium flex items-center justify-between">
+              <span>{notesSavedNotice}</span>
+              <button
+                type="button"
+                onClick={() => setNotesSavedNotice(null)}
+                className="text-emerald-400 font-bold hover:text-white ml-2 text-sm"
+              >
+                &times;
+              </button>
+            </div>
+          )}
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-slate-200 font-bold flex items-center gap-1.5">
+                <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                <span>رسید کی خصوصی ہدایات (Urdu Notes Textbox):</span>
+              </label>
+              <button
+                type="button"
+                onClick={handleResetNotesToDefault}
+                className="text-[10px] text-amber-300 hover:text-white underline font-semibold flex items-center gap-1 cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>اصل ڈیفالٹ ہدایات پر ری سیٹ کریں</span>
+              </button>
+            </div>
+
+            <textarea
+              rows={9}
+              value={customerReceiptNotes}
+              onChange={(e) => setCustomerReceiptNotes(e.target.value)}
+              placeholder="یہاں کسٹمر کے لیے ہدایات درج کریں..."
+              className="w-full px-3.5 py-3 rounded-xl bg-[#030b1e] border border-slate-700 text-white font-serif text-sm leading-relaxed focus:border-emerald-400 focus:outline-none"
+              dir="rtl"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800">
+            <p className="text-[10px] text-slate-400">
+              * لمبی تحریر کی صورت میں رسید تصویر کا سائز خودکار طور پر مناسب بڑھ جائے گا اور کوئی تحریر نہیں کٹے گی۔
+            </p>
+            <button
+              type="button"
+              onClick={handleSaveNotesOnly}
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>Save Notes (صرف نوٹس محفوظ کریں)</span>
+            </button>
+          </div>
+        </div>
+
         {/* Save Changes Button */}
         <div className="flex justify-end pt-2">
           <button
@@ -367,6 +476,73 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
 
       </form>
+      )}
+
+      {/* Standalone Notes Tab Display */}
+      {activeTab === 'notes' && (
+        <div className="glass-panel p-6 rounded-2xl space-y-5 border border-emerald-500/40">
+          <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+            <div>
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-400" />
+                <span>CUSTOMER RECEIPT NOTES / رسید کی خصوصی ہدایات</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                واٹس ایپ اور پرنٹ رسید کارڈ پر کسٹمر کے لیے خصوصی شرائط و احکامات
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetNotesToDefault}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>اصل ڈیفالٹ پر ری سیٹ کریں</span>
+            </button>
+          </div>
+
+          {notesSavedNotice && (
+            <div className="p-3 rounded-xl bg-emerald-950/90 border border-emerald-500 text-emerald-200 text-xs font-semibold flex items-center justify-between">
+              <span>{notesSavedNotice}</span>
+              <button
+                type="button"
+                onClick={() => setNotesSavedNotice(null)}
+                className="text-emerald-400 font-bold hover:text-white ml-2 text-sm"
+              >
+                &times;
+              </button>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-xs text-slate-300 font-bold flex items-center gap-1.5">
+              <Edit3 className="w-4 h-4 text-emerald-400" />
+              <span>ہدایات میں ترمیم کریں (Edit Customer Receipt Notes):</span>
+            </label>
+            <textarea
+              rows={11}
+              value={customerReceiptNotes}
+              onChange={(e) => setCustomerReceiptNotes(e.target.value)}
+              className="w-full px-4 py-3.5 rounded-xl bg-[#030b1e] border border-slate-700 text-white font-serif text-sm leading-relaxed focus:border-emerald-400 focus:outline-none"
+              dir="rtl"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800">
+            <div className="text-[11px] text-slate-400 space-y-0.5">
+              <p className="text-emerald-400 font-bold">✓ خودکار لاگو:</p>
+              <p>ایک مرتبہ نوٹس محفوظ کرنے کے بعد ہر نئی کسٹمر رسید اور واٹس ایپ تصویر پر خودکار نظر آئیں گے۔</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveNotesOnly}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              <span>Save Notes (ہدایات محفوظ کریں)</span>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
