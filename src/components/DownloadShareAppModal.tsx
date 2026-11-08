@@ -210,7 +210,7 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
                   <span>1. Download Android APK</span>
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold border border-emerald-500/30">
-                  3.83 MB • Signed
+                  10.9 MB • Signed
                 </span>
               </div>
               <p className="text-[11px] text-slate-300">
@@ -219,7 +219,7 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
               <div className="mt-1.5 flex items-center gap-2 text-[10px] font-mono text-slate-400">
                 <span>فائل: Musa_Mobile_Repairing_Center.apk</span>
                 <span>•</span>
-                <span className="text-emerald-400 font-bold">3.83 MB</span>
+                <span className="text-emerald-400 font-bold">10.9 MB</span>
               </div>
             </div>
 
@@ -230,7 +230,7 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
                 className="w-full py-2.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4 text-[#d4af37]" />
-                <span>Direct Download APK (3.83 MB ڈاؤن لوڈ)</span>
+                <span>Direct Download APK (10.9 MB ڈاؤن لوڈ)</span>
               </a>
 
               <a

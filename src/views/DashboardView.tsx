@@ -204,10 +204,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               href="/Musa_Mobile_Repairing_Center.apk"
               download="Musa_Mobile_Repairing_Center.apk"
               className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs border border-emerald-300/50 flex items-center gap-2 shadow-lg shadow-emerald-900/30 transition hover:scale-105 active:scale-95 cursor-pointer"
-              title="Download Musa_Mobile_Repairing_Center.apk (3.83 MB - Signed Android Release APK)"
+              title="Download Musa_Mobile_Repairing_Center.apk (10.9 MB - Signed Android Release APK)"
             >
               <Smartphone className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span>اینڈرائیڈ APK ڈاؤن لوڈ (3.83 MB)</span>
+              <span>اینڈرائیڈ APK ڈاؤن لوڈ (10.9 MB)</span>
             </a>
             <button
               onClick={onQuickBackup}
