@@ -35,6 +35,8 @@ android {
             } else {
                 initWith(signingConfigs.debug)
             }
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
     buildTypes {

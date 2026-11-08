@@ -27,8 +27,6 @@ import { SplashScreen } from './components/SplashScreen';
 import { LoginScreen } from './components/LoginScreen';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { PrintReceiptModal } from './components/PrintReceiptModal';
-import { PWAInstallButton } from './components/PWAInstallButton';
-import { DownloadShareAppModal } from './components/DownloadShareAppModal';
 import { AlarmRingingModal } from './components/AlarmRingingModal';
 import { SmartCustomerAutoSearchBar } from './components/SmartCustomerAutoSearchBar';
 import { CustomerFullRecordModal } from './components/CustomerFullRecordModal';
@@ -132,7 +130,6 @@ export default function App() {
 
   // Receipt Modal State
   const [activeReceiptJob, setActiveReceiptJob] = useState<JobCard | null>(null);
-  const [showDownloadShareModal, setShowDownloadShareModal] = useState(false);
 
   // Smart Customer Full Record Modal State
   const [showFullRecordModal, setShowFullRecordModal] = useState(false);
@@ -481,48 +478,7 @@ export default function App() {
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             
-            {/* Direct Download Android APK Button */}
-            <a
-              href="/musa-mobile.apk"
-              download="Musa-Mobile-Repairing-v2.0.apk"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 border border-emerald-400/50 text-white font-black text-xs shadow-lg transition hover:scale-105 active:scale-95"
-              title="Download Android APK directly (براہِ راست اینڈرائیڈ APK ڈاؤن لوڈ کریں)"
-            >
-              <Download className="w-3.5 h-3.5 text-yellow-300" />
-              <span>Download APK</span>
-            </a>
-
-            {/* Share & APK Modal Button */}
-            <button
-              onClick={() => setShowDownloadShareModal(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-900/90 to-blue-900/90 hover:from-indigo-800 hover:to-blue-800 border border-indigo-400/40 text-indigo-200 hover:text-white font-bold text-xs shadow-md transition"
-              title="Share Application & Options"
-            >
-              <Share2 className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span className="hidden sm:inline">Share</span>
-            </button>
-
             {/* Smart Repair Alarm Quick Header Button */}
-            <button
-              onClick={() => setCurrentView('reminders')}
-              className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition ${
-                activeRemindersCount > 0
-                  ? 'bg-amber-950/80 hover:bg-amber-900 border-amber-500/60 text-amber-300 animate-pulse shadow-md'
-                  : 'bg-[#030b1e] hover:bg-slate-800 border-slate-700 text-slate-300'
-              }`}
-              title="Smart Repair Reminders & Alarms"
-            >
-              <Bell className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span className="hidden md:inline">Alarms</span>
-              {activeRemindersCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-red-600 text-white font-mono text-[10px] font-bold">
-                  {activeRemindersCount}
-                </span>
-              )}
-            </button>
-
-            {/* PWA Install Button */}
-            <PWAInstallButton />
 
             {/* Quick "New Repair" Button */}
             <button
@@ -837,18 +793,6 @@ export default function App() {
                 <span className="text-[#d4af37] font-serif text-[11px]">بیک اپ و ڈیٹا سیکیورٹی</span>
               </p>
               <nav className="space-y-1">
-                <button
-                  onClick={() => setShowDownloadShareModal(true)}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                >
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="w-4 h-4 text-indigo-400" />
-                    <span>Download & Share APK</span>
-                  </div>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">
-                    APK
-                  </span>
-                </button>
 
                 <button
                   onClick={() => setCurrentView('localBackup')}
@@ -1167,15 +1111,6 @@ export default function App() {
         job={activeReceiptJob}
         settings={settings}
         onClose={() => setActiveReceiptJob(null)}
-      />
-
-      {/* DOWNLOAD & SHARE APK MODAL */}
-      <DownloadShareAppModal
-        isOpen={showDownloadShareModal}
-        onClose={() => setShowDownloadShareModal(false)}
-        shopPhone={settings.phone}
-        shopAddress={settings.address}
-        customLogoUrl={settings.customLogoUrl}
       />
 
       {/* EMERGENCY SMART REPAIR ALARM MODAL */}

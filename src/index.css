@@ -19,9 +19,18 @@
   input[type="number"],
   input[type="search"],
   input[type="tel"],
-  input[type="email"] {
+  input[type="email"],
+  input[type="date"] {
     -webkit-user-select: text;
     user-select: text;
+  }
+
+  /* Prevent Android Chrome / WebView auto-zoom while typing and guarantee full text visibility */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important;
+      line-height: 1.4 !important;
+    }
   }
 }
 

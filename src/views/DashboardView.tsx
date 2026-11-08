@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Customer, JobCard, SparePart, Expense, ShopSettings } from '../types';
 import { RotatingLogo } from '../components/RotatingLogo';
-import { DownloadShareAppModal } from '../components/DownloadShareAppModal';
 import { SHOP_PERSONNEL } from '../data/shopContacts';
-import { generateAndDownloadApk } from '../services/apkGenerator';
 import {
   Users,
   Wrench,
@@ -53,10 +51,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenReceipt,
   onQuickBackup,
 }) => {
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
-  const [apkLoading, setApkLoading] = useState(false);
-
   const todayStr = new Date().toISOString().split('T')[0];
   const currentMonthStr = todayStr.substring(0, 7);
 
@@ -477,176 +471,118 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* =========================================================================
-          DOWNLOAD AND SHARE APP SECTION (موبائل ایپ ڈاؤن لوڈ و شیئرنگ)
+          DATABASE BACKUP & SHOP QUICK TOOLS (بیک اپ و فوری ٹولز)
           ========================================================================= */}
       <div className="glass-panel p-5 rounded-2xl border border-[#d4af37]/40 shadow-2xl bg-gradient-to-br from-[#0a192f] via-[#030b1e] to-[#0a192f] space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-3">
-            <RotatingLogo size="sm" showGlow={true} customLogoUrl={settings.customLogoUrl} />
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                <span>Download & Share Musa Mobile App</span>
-                <span className="text-xs font-serif text-[#d4af37]">ایپ ڈاؤن لوڈ و شیئرنگ</span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                اینڈرائیڈ APK ڈاؤن لوڈ کریں، واٹس ایپ پر شیئر کریں یا مکمل ڈیٹا بیک اپ حاصل کریں
-              </p>
-            </div>
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <HardDrive className="w-4 h-4 text-[#d4af37]" />
+              <span>Database Backup & Shop Management Quick Tools</span>
+              <span className="text-xs font-serif text-[#d4af37]">بیک اپ و ڈیٹا سسٹم</span>
+            </h3>
+            <p className="text-xs text-slate-400">
+              شاپ کے کسٹمرز، رسیدیں، ادھار کھاتہ اور اسپیئر پارٹس کا مکمل ڈیٹا محفوظ رکھیں
+            </p>
           </div>
 
           <button
-            onClick={() => setShowDownloadModal(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-[#0353a4]/50 hover:bg-[#0353a4] border border-blue-400/40 text-white font-bold text-xs flex items-center gap-1.5 transition"
+            type="button"
+            onClick={onQuickBackup}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-lg transition active:scale-95 cursor-pointer"
           >
-            <span>Open APK Studio & Info</span>
-            <ExternalLink className="w-3.5 h-3.5 text-[#d4af37]" />
+            <Download className="w-3.5 h-3.5 text-black" />
+            <span>فوری بیک اپ (.zip ڈاؤن لوڈ)</span>
           </button>
         </div>
 
-        {/* 5 Required Action Buttons Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+        {/* 4 Shop Quick Actions */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           
-          {/* 1. Download Android APK */}
-          <a
-            href="/Musa-Mobile-Repairing-v2.0.apk"
-            download="Musa-Mobile-Repairing-v2.0.apk"
-            className="p-3 rounded-xl bg-gradient-to-br from-indigo-950 to-blue-950 border border-indigo-500/50 hover:border-indigo-400 text-left transition flex flex-col justify-between gap-2 shadow-lg group hover:scale-[1.02] active:scale-95 cursor-pointer"
-            title="Download Android APK File Directly"
-          >
-            <div className="flex items-center justify-between w-full">
-              <span className="p-1.5 rounded-lg bg-indigo-500/20 text-[#d4af37]">
-                <Smartphone className="w-4 h-4" />
-              </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-mono font-bold">
-                Direct APK
-              </span>
-            </div>
-            <div>
-              <p className="font-bold text-white text-xs">1. Download Android APK</p>
-              <p className="text-[10px] text-slate-400 mt-0.5 font-serif text-[#d4af37]">
-                براہِ راست اینڈرائیڈ APK فائل ڈاؤن لوڈ کریں
-              </p>
-            </div>
-          </a>
-
-          {/* 2. Share Application */}
+          {/* 1. New Repair */}
           <button
             type="button"
-            onClick={async () => {
-              if (navigator.share) {
-                try {
-                  await navigator.share({
-                    title: 'MUSA MOBILE REPAIRING CENTER',
-                    text: 'موسی موبائل ریپیئرنگ سینٹر - موبائل مرمت، پارٹس اور مینجمنٹ ایپلیکیشن',
-                    url: window.location.href,
-                  });
-                } catch {
-                  // cancel
-                }
-              } else {
-                await navigator.clipboard.writeText(window.location.href);
-                setLinkCopied(true);
-                setTimeout(() => setLinkCopied(false), 2000);
-              }
-            }}
-            className="p-3 rounded-xl bg-gradient-to-br from-blue-950 to-slate-900 border border-blue-500/50 hover:border-blue-400 text-left transition flex flex-col justify-between gap-2 shadow-lg group hover:scale-[1.02] active:scale-95"
+            onClick={() => onNavigate('newRepair')}
+            className="p-3.5 rounded-xl bg-gradient-to-br from-blue-950 to-slate-900 border border-blue-500/40 hover:border-blue-400 text-left transition flex flex-col justify-between gap-2 shadow-md group hover:scale-[1.02] active:scale-95 cursor-pointer"
           >
             <div className="flex items-center justify-between w-full">
-              <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400">
-                <Share2 className="w-4 h-4" />
+              <span className="p-1.5 rounded-lg bg-blue-500/20 text-[#d4af37]">
+                <PlusCircle className="w-4 h-4" />
               </span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/30 text-blue-300 font-bold">
-                Share
+                Repair
               </span>
             </div>
             <div>
-              <p className="font-bold text-white text-xs">2. Share Application</p>
+              <p className="font-bold text-white text-xs">1. New Job Card</p>
               <p className="text-[10px] text-slate-400 mt-0.5 font-serif text-[#d4af37]">
-                ایپ دوستوں کو بھیجیں
+                نیا کسٹمر جاب کارڈ بنائیں
               </p>
             </div>
           </button>
 
-          {/* 3. Copy App Link */}
+          {/* 2. Udhar Khata */}
           <button
             type="button"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(window.location.href);
-                setLinkCopied(true);
-                setTimeout(() => setLinkCopied(false), 2000);
-              } catch {
-                // ignore
-              }
-            }}
-            className="p-3 rounded-xl bg-gradient-to-br from-slate-900 to-[#030b1e] border border-slate-700 hover:border-slate-500 text-left transition flex flex-col justify-between gap-2 shadow-lg group hover:scale-[1.02] active:scale-95"
+            onClick={() => onNavigate('udharKhata')}
+            className="p-3.5 rounded-xl bg-gradient-to-br from-indigo-950 to-slate-900 border border-indigo-500/40 hover:border-indigo-400 text-left transition flex flex-col justify-between gap-2 shadow-md group hover:scale-[1.02] active:scale-95 cursor-pointer"
           >
             <div className="flex items-center justify-between w-full">
-              <span className="p-1.5 rounded-lg bg-slate-800 text-slate-300">
-                {linkCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-[#d4af37]" />}
+              <span className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300">
+                <Handshake className="w-4 h-4 text-[#d4af37]" />
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono font-bold">
-                {linkCopied ? 'Copied' : 'Link'}
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-bold">
+                Khata
               </span>
             </div>
             <div>
-              <p className="font-bold text-white text-xs">3. Copy App Link</p>
+              <p className="font-bold text-white text-xs">2. Customer Udhar Khata</p>
               <p className="text-[10px] text-slate-400 mt-0.5 font-serif text-[#d4af37]">
-                {linkCopied ? 'لنک کاپی ہو گیا!' : 'ایپ لنک کاپی کریں'}
+                کسٹمر ادھار و بقایا جات
               </p>
             </div>
           </button>
 
-          {/* 4. Share on WhatsApp */}
+          {/* 3. Inventory Stock */}
           <button
             type="button"
-            onClick={() => {
-              const msg =
-                `*MUSA MOBILE REPAIRING CENTER*\n` +
-                `*موسی موبائل ریپیئرنگ سینٹر*\n` +
-                `--------------------------------\n` +
-                `پروپرائٹر: میاں اظہر قریشی | رابطہ: 03006861765\n` +
-                `پتہ: واٹر پلانٹ، نزد قبا آپٹیکل، مظفرگڑھ سٹی\n` +
-                `موبائل ریپیئرنگ سروسز اور ریکارڈ کے لیے ویب ایپ استعمال کریں:\n` +
-                `${window.location.href}`;
-              window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-            }}
-            className="p-3 rounded-xl bg-gradient-to-br from-emerald-950 to-teal-950 border border-emerald-500/50 hover:border-emerald-400 text-left transition flex flex-col justify-between gap-2 shadow-lg group hover:scale-[1.02] active:scale-95"
+            onClick={() => onNavigate('inventory')}
+            className="p-3.5 rounded-xl bg-gradient-to-br from-emerald-950 to-slate-900 border border-emerald-500/40 hover:border-emerald-400 text-left transition flex flex-col justify-between gap-2 shadow-md group hover:scale-[1.02] active:scale-95 cursor-pointer"
           >
             <div className="flex items-center justify-between w-full">
-              <span className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400">
-                <Smartphone className="w-4 h-4" />
+              <span className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300">
+                <Boxes className="w-4 h-4 text-[#d4af37]" />
               </span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/30 text-emerald-300 font-bold">
-                WhatsApp
+                Stock
               </span>
             </div>
             <div>
-              <p className="font-bold text-white text-xs">4. Share on WhatsApp</p>
+              <p className="font-bold text-white text-xs">3. Spare Parts Stock</p>
               <p className="text-[10px] text-slate-400 mt-0.5 font-serif text-[#d4af37]">
-                واٹس ایپ پر شیئر کریں
+                اسپیئر پارٹس انوینٹری
               </p>
             </div>
           </button>
 
-          {/* 5. Download App Backup */}
+          {/* 4. Local Backup & Restore */}
           <button
             type="button"
-            onClick={onQuickBackup}
-            className="p-3 rounded-xl bg-gradient-to-br from-amber-950 to-yellow-950 border border-amber-500/50 hover:border-amber-400 text-left transition flex flex-col justify-between gap-2 shadow-lg group hover:scale-[1.02] active:scale-95"
+            onClick={() => onNavigate('localBackup')}
+            className="p-3.5 rounded-xl bg-gradient-to-br from-amber-950 to-slate-900 border border-amber-500/40 hover:border-amber-400 text-left transition flex flex-col justify-between gap-2 shadow-md group hover:scale-[1.02] active:scale-95 cursor-pointer"
           >
             <div className="flex items-center justify-between w-full">
               <span className="p-1.5 rounded-lg bg-amber-500/20 text-[#d4af37]">
-                <Download className="w-4 h-4" />
+                <HardDrive className="w-4 h-4" />
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold">
-                ZIP
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-bold">
+                Backup
               </span>
             </div>
             <div>
-              <p className="font-bold text-white text-xs">5. Download App Backup</p>
+              <p className="font-bold text-white text-xs">4. Local Backup & Restore</p>
               <p className="text-[10px] text-slate-400 mt-0.5 font-serif text-[#d4af37]">
-                مکمل ڈیٹا بیک اپ (.zip)
+                بیک اپ محفوظ و بحال کریں
               </p>
             </div>
           </button>
@@ -756,15 +692,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </table>
         </div>
       </div>
-
-      {/* Download and Share App Modal */}
-      <DownloadShareAppModal
-        isOpen={showDownloadModal}
-        onClose={() => setShowDownloadModal(false)}
-        shopPhone={settings.phone}
-        shopAddress={settings.address}
-        customLogoUrl={settings.customLogoUrl}
-      />
     </div>
   );
 };
