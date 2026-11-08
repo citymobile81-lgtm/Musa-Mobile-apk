@@ -209,23 +209,38 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
                   <Smartphone className="w-4 h-4 text-[#d4af37]" />
                   <span>1. Download Android APK</span>
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">
-                  v2.0 Release
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold border border-emerald-500/30">
+                  3.83 MB • Signed
                 </span>
               </div>
               <p className="text-[11px] text-slate-300">
-                اینڈرائیڈ موبائل میں براہِ راست انسٹال کرنے کے لیے اصل APK پیکج فائل حاصل کریں۔
+                اینڈرائیڈ موبائل میں براہِ راست انسٹال کرنے کے لیے اصل <strong className="text-amber-300">Musa_Mobile_Repairing_Center.apk</strong> حاصل کریں۔
               </p>
+              <div className="mt-1.5 flex items-center gap-2 text-[10px] font-mono text-slate-400">
+                <span>فائل: Musa_Mobile_Repairing_Center.apk</span>
+                <span>•</span>
+                <span className="text-emerald-400 font-bold">3.83 MB</span>
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <a
-                href="/Musa-Mobile-Repairing-v2.0.apk"
-                download="Musa-Mobile-Repairing-v2.0.apk"
-                className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
+                href="/Musa_Mobile_Repairing_Center.apk"
+                download="Musa_Mobile_Repairing_Center.apk"
+                className="w-full py-2.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
               >
                 <Download className="w-4 h-4 text-[#d4af37]" />
-                <span>Direct Download APK (براہِ راست ڈاؤن لوڈ)</span>
+                <span>Direct Download APK (3.83 MB ڈاؤن لوڈ)</span>
+              </a>
+
+              <a
+                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.0/Musa_Mobile_Repairing_Center.apk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-1.5 bg-[#030b1e] hover:bg-slate-800 border border-indigo-500/40 text-indigo-300 font-semibold rounded-lg text-[10.5px] flex items-center justify-center gap-1.5 transition"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Online Cloud Mirror (GitHub Releases CDN)</span>
               </a>
 
               {/* Secondary PWA Install option */}
