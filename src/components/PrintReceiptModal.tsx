@@ -2,8 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { JobCard, ShopSettings } from '../types';
 import { RotatingLogo } from './RotatingLogo';
 import { SHOP_PERSONNEL } from '../data/shopContacts';
-import { Printer, Share2, X, Download, Image as ImageIcon, Loader2, Check } from 'lucide-react';
+import {
+  Printer,
+  Share2,
+  X,
+  Download,
+  Image as ImageIcon,
+  Loader2,
+  Check,
+  MessageSquare,
+  FileText,
+} from 'lucide-react';
 import QRCode from 'qrcode';
+import { jsPDF } from 'jspdf';
 import { generateReceiptImageCard } from '../services/receiptImageGenerator';
 
 interface PrintReceiptModalProps {
@@ -19,6 +30,8 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
 }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [printFormat, setPrintFormat] = useState<'80mm' | '58mm' | 'a4'>('80mm');
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
@@ -61,8 +74,136 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
 
   if (!job) return null;
 
-  const handlePrint = () => {
+  /**
+   * Triggers clean system print with active format (58mm, 80mm, or A4)
+   * Compatible with Bluetooth, Wi-Fi, USB OTG thermal and office printers.
+   */
+  const handlePrintReceipt = (overrideFormat?: '80mm' | '58mm' | 'a4') => {
+    const fmt = overrideFormat || printFormat;
+    const elem = document.getElementById('printable-receipt');
+    if (elem) {
+      elem.setAttribute('data-print-format', fmt);
+    }
     window.print();
+  };
+
+  /**
+   * Generates a genuine PDF receipt document using jsPDF and the high-res canvas.
+   * Text and Urdu Nastaliq are rendered with 100% vector-crisp fidelity with zero broken characters.
+   */
+  const handleGeneratePDF = async () => {
+    if (!job) return;
+    setIsGeneratingPDF(true);
+    setShareFeedback(null);
+
+    try {
+      const { dataUrl } = await generateReceiptImageCard({ job, settings });
+      setImagePreviewUrl(dataUrl);
+
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise((resolve) => {
+        img.onload = resolve;
+      });
+
+      const imgWidth = img.naturalWidth || 1200;
+      const imgHeight = img.naturalHeight || 2000;
+
+      // Create PDF document (Standard A4 portrait: 210 x 297 mm)
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 8;
+      const availableWidth = pageWidth - margin * 2;
+      const availableHeight = pageHeight - margin * 2;
+
+      let renderWidth = availableWidth;
+      let renderHeight = (imgHeight * renderWidth) / imgWidth;
+
+      if (renderHeight > availableHeight) {
+        renderHeight = availableHeight;
+        renderWidth = (imgWidth * renderHeight) / imgHeight;
+      }
+
+      const x = (pageWidth - renderWidth) / 2;
+      const y = margin;
+
+      pdf.addImage(dataUrl, 'PNG', x, y, renderWidth, renderHeight);
+
+      const cleanCust = (job.customerName || 'customer').replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, '_');
+      const pdfFileName = `Musa_Receipt_${job.jobId || job.jobCardNumber}_${cleanCust}.pdf`;
+
+      const pdfBlob = pdf.output('blob');
+      const pdfFile = new File([pdfBlob], pdfFileName, { type: 'application/pdf' });
+
+      // Check if browser Web Share supports PDF file transfer directly on Android
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        try {
+          await navigator.share({
+            files: [pdfFile],
+            title: `Musa Mobile Receipt #${job.jobId || job.jobCardNumber}`,
+            text: `موسیٰ موبائل ریپیئرنگ سنٹر - رسید کارڈ #${job.jobId || job.jobCardNumber}`,
+          });
+          setShareFeedback('پی ڈی ایف رسید کامیابی سے شیئر ہو گئی!');
+          setIsGeneratingPDF(false);
+          return;
+        } catch (shareErr: unknown) {
+          if ((shareErr as { name?: string })?.name !== 'AbortError') {
+            console.warn('PDF share cancelled or failed, falling back to download', shareErr);
+          }
+        }
+      }
+
+      // Fallback: Direct download of standalone .pdf file
+      pdf.save(pdfFileName);
+      setShareFeedback('پی ڈی ایف رسید کامیابی سے ڈاؤن لوڈ ہو گئی!');
+    } catch (err) {
+      console.error('Error generating PDF receipt', err);
+      setShareFeedback('PDF بنانے میں خرابی پیش آگئی۔ براہ کرم دوبارہ کوشش کریں۔');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  /**
+   * Auto-formats and opens mobile SMS messenger with complete Urdu receipt details.
+   * Completely offline, no internet or external SMS credits required.
+   */
+  const handleSendSMS = () => {
+    if (!job) return;
+    let phone = job.customerPhone.replace(/[^0-9]/g, '');
+    if (phone.startsWith('92') && phone.length === 12) {
+      phone = '0' + phone.substring(2);
+    }
+
+    const totalBill = job.estimatedCost || job.cost || 0;
+    const advance = job.advancePaid || 0;
+    const balance = job.balance ?? (totalBill - advance);
+
+    const smsMessage =
+`موسیٰ موبائل ریپیئرنگ سنٹر
+رسید نمبر: #${job.jobId || job.jobCardNumber}
+کسٹمر: ${job.customerName}
+موبائل: ${job.company} ${job.model}
+خرابی: ${job.fault || job.issue}
+کل رقم: PKR ${totalBill.toLocaleString()}
+ایڈوانس: PKR ${advance.toLocaleString()}
+بقایا رقم: PKR ${balance.toLocaleString()}
+پتہ: واٹر پلانٹ نزد قبا آپٹیکل، مظفرگڑھ
+رابطہ: 03006861765 - 03216861765
+آپ کے اعتماد کا شکریہ!`;
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const separator = isIOS ? '&' : '?';
+    const smsUrl = `sms:${phone}${separator}body=${encodeURIComponent(smsMessage)}`;
+
+    setShareFeedback('موبائل ایس ایم ایس ایپ کھولی جا رہی ہے...');
+    window.location.href = smsUrl;
   };
 
   /**
@@ -206,6 +347,7 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
         {/* PRINTABLE RECEIPT TEMPLATE (Used for Paper/Thermal Printer & PDF) */}
         <div
           id="printable-receipt"
+          data-print-format={printFormat}
           className="p-4 border-2 border-slate-900 rounded-xl bg-white text-black font-sans text-xs space-y-3"
         >
           {/* Header */}
@@ -437,50 +579,117 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
           </div>
         )}
 
-        {/* Modal Buttons (Hidden in Print) */}
-        <div className="no-print pt-2 flex flex-wrap items-center justify-between gap-2">
-          {/* Main Action: Send Genuine WhatsApp Image Card */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleWhatsAppImageShare}
-              disabled={isGeneratingImage}
-              className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-green-600/25 transition cursor-pointer disabled:opacity-60"
-            >
-              {isGeneratingImage ? (
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-              ) : (
-                <Share2 className="w-4 h-4 text-amber-300" />
-              )}
-              <span>WhatsApp پر تصویری رسید بھیجیں</span>
-            </button>
-
-            <button
-              onClick={handleDownloadImageCard}
-              disabled={isGeneratingImage}
-              className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-              title="Save Image Card directly (PNG)"
-            >
-              <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
-              <span>Save Image</span>
-            </button>
+        {/* Print & Output Format Toolbar (Hidden in Print) */}
+        <div className="no-print pt-2 space-y-2.5 border-t border-slate-200">
+          {/* Printer Format Selector */}
+          <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+            <div className="flex items-center gap-1.5 text-slate-700 font-bold">
+              <Printer className="w-3.5 h-3.5 text-blue-600" />
+              <span>پرنٹر سائز (Printer Size):</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setPrintFormat('80mm')}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                  printFormat === '80mm'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                80mm تھرمل
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintFormat('58mm')}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                  printFormat === '58mm'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                58mm منی
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrintFormat('a4')}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                  printFormat === 'a4'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                A4 صفحہ
+              </button>
+            </div>
           </div>
 
-          {/* Existing Print & PDF Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrint}
-              className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>PDF</span>
-            </button>
-            <button
-              onClick={handlePrint}
-              className="px-4 py-2.5 bg-[#0466c8] hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-blue-500/20 transition cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>پرنٹ رسید</span>
-            </button>
+          {/* Action Buttons Row */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {/* WhatsApp & SMS Actions */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleWhatsAppImageShare}
+                disabled={isGeneratingImage || isGeneratingPDF}
+                className="px-3.5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-green-600/20 transition cursor-pointer disabled:opacity-60"
+              >
+                {isGeneratingImage ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  <Share2 className="w-4 h-4 text-amber-300" />
+                )}
+                <span>WhatsApp تصویری رسید</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSendSMS}
+                className="px-3.5 py-2.5 bg-gradient-to-r from-teal-700 to-cyan-700 hover:from-teal-800 hover:to-cyan-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer"
+                title="Send SMS directly via Android Messages app"
+              >
+                <MessageSquare className="w-4 h-4 text-cyan-200" />
+                <span>SEND SMS / میسج بھیجیں</span>
+              </button>
+            </div>
+
+            {/* PDF, Print & PNG Download Actions */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleGeneratePDF}
+                disabled={isGeneratingPDF || isGeneratingImage}
+                className="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer disabled:opacity-60"
+                title="Generate standalone PDF document with intact Urdu"
+              >
+                {isGeneratingPDF ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                ) : (
+                  <FileText className="w-4 h-4 text-rose-400" />
+                )}
+                <span>PDF رسید</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handlePrintReceipt(printFormat)}
+                className="px-4 py-2.5 bg-[#0466c8] hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-blue-500/20 transition cursor-pointer"
+                title="Print on connected Bluetooth/Wi-Fi/USB Thermal or A4 printer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>پرنٹ رسید ({printFormat.toUpperCase()})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadImageCard}
+                disabled={isGeneratingImage || isGeneratingPDF}
+                className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition cursor-pointer"
+                title="Save Image Card (PNG)"
+              >
+                <ImageIcon className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 

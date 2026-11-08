@@ -615,12 +615,28 @@ body.theme-premium_white {
 }
 
 @media print {
+  @page {
+    margin: 5mm;
+    size: auto;
+  }
+  
+  /* Hide everything on screen except printable receipt container */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   body * {
     visibility: hidden !important;
   }
-  #printable-receipt, #printable-receipt * {
+
+  #printable-receipt,
+  #printable-receipt * {
     visibility: visible !important;
   }
+
   #printable-receipt {
     position: absolute !important;
     left: 0 !important;
@@ -628,11 +644,36 @@ body.theme-premium_white {
     width: 100% !important;
     max-width: 80mm !important;
     margin: 0 auto !important;
-    padding: 8px !important;
+    padding: 6px !important;
     background: #ffffff !important;
     color: #000000 !important;
     box-shadow: none !important;
+    border: 1.5px solid #000000 !important;
+    border-radius: 4px !important;
   }
+
+  #printable-receipt[data-print-format="58mm"] {
+    max-width: 56mm !important;
+    padding: 3px !important;
+    font-size: 8px !important;
+    border: 1px solid #000000 !important;
+  }
+
+  #printable-receipt[data-print-format="80mm"] {
+    max-width: 80mm !important;
+    padding: 6px !important;
+    font-size: 10.5px !important;
+    border: 1.5px solid #000000 !important;
+  }
+
+  #printable-receipt[data-print-format="a4"] {
+    max-width: 185mm !important;
+    margin: 0 auto !important;
+    padding: 14px !important;
+    font-size: 13px !important;
+    border: 2px solid #000000 !important;
+  }
+
   .no-print {
     display: none !important;
   }

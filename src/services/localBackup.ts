@@ -5,6 +5,7 @@ import {
   getSettings,
   saveSettings,
   logActivity,
+  clearObjectStore,
 } from './db';
 import {
   Customer,
@@ -21,7 +22,7 @@ import {
   ActivityLog,
 } from '../types';
 
-export const BACKUP_FOLDER_DEFAULT = 'MUSA MOBILE BACKUP';
+export const BACKUP_FOLDER_DEFAULT = 'MUSA MOBILE COMPLETE BACKUP';
 const HISTORY_KEY = 'musa_local_backup_history';
 const LAST_BACKUP_KEY = 'musa_last_local_backup_date';
 const SAFETY_SNAPSHOT_KEY = 'musa_safety_snapshot';
@@ -277,7 +278,7 @@ MUSA MOBILE REPAIRING CENTER - SECURE LOCAL SYSTEM BACKUP
   });
 }
 
-export const MASTER_BACKUP_FILENAME_BASE = 'MUSA_MOBILE_MASTER_BACKUP';
+export const MASTER_BACKUP_FILENAME_BASE = 'MUSA_FULL_BACKUP';
 
 /**
  * Execute local backup export (JSON or ZIP) - Continuously updates MUSA_MOBILE_MASTER_BACKUP in 'MUSA MOBILE BACKUP' folder
@@ -511,17 +512,18 @@ export async function parseBackupFile(file: File): Promise<any> {
 }
 
 /**
- * Execute restore from parsed data with de-duplication and transaction safety
+ * Execute restore from parsed data with de-duplication, replace/merge modes, and transaction safety
  */
 export async function executeRestoreFromParsedData(
-  parsed: any
+  parsed: any,
+  mode: 'merge' | 'replace' = 'merge'
 ): Promise<{ success: boolean; message: string; counts?: any }> {
   const validation = validateBackupData(parsed);
   if (!validation.valid) {
     return { success: false, message: validation.error || 'بیک اپ فائل غلط ہے۔' };
   }
 
-  // Take safety snapshot first
+  // Take safety snapshot first before modifying database
   await createSafetySnapshot();
 
   const data = parsed.data || parsed;
@@ -536,7 +538,29 @@ export async function executeRestoreFromParsedData(
   const payments: PaymentRecord[] = data.payments || [];
   const settings: ShopSettings = data.settings;
 
-  // Insert records into IndexedDB using putRecord (handles de-duplication by key)
+  // In replace mode (مکمل تبدیل کریں), clear previous records first so new phone receives clean state
+  if (mode === 'replace') {
+    try {
+      await clearObjectStore('customers');
+      await clearObjectStore('job_cards');
+      await clearObjectStore('inventory');
+      await clearObjectStore('purchases');
+      await clearObjectStore('sales');
+      await clearObjectStore('expenses');
+      await clearObjectStore('employees');
+      await clearObjectStore('attendance');
+      await clearObjectStore('payments');
+      try {
+        await clearObjectStore('reminders');
+      } catch {
+        // reminders store optional
+      }
+    } catch (clearErr) {
+      console.warn('Error clearing stores during replace restore:', clearErr);
+    }
+  }
+
+  // Insert records into IndexedDB using putRecord
   for (const item of customers) await putRecord('customers', item);
   for (const item of jobCards) await putRecord('job_cards', item);
   for (const item of inventory) await putRecord('inventory', item);
@@ -548,14 +572,16 @@ export async function executeRestoreFromParsedData(
   for (const item of payments) await putRecord('payments', item);
   if (settings) await saveSettings(settings);
 
+  const modeUrdu = mode === 'replace' ? 'مکمل تبدیل (Replace)' : 'شامل و ضم (Merge)';
+
   await logActivity(
     'LOCAL_RESTORE_SUCCESS',
-    `Restored ${jobCards.length} jobs, ${customers.length} clients, ${inventory.length} parts from local backup`
+    `Restored ${jobCards.length} jobs, ${customers.length} clients, ${inventory.length} parts in ${mode} mode`
   );
 
   return {
     success: true,
-    message: `ڈیٹا کامیابی کے ساتھ بحال ہو گیا! (${customers.length} کسٹمرز، ${jobCards.length} جاب کارڈز، ${inventory.length} پارٹس)`,
+    message: `ڈیٹا بحال ہو گیا! [طریقہ: ${modeUrdu}] (${customers.length} کسٹمرز، ${jobCards.length} جاب کارڈز، ${inventory.length} اسپیئر پارٹس)`,
     counts: {
       customers: customers.length,
       jobCards: jobCards.length,

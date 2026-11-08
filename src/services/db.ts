@@ -228,6 +228,17 @@ export async function deleteRecord(storeName: string, key: IDBValidKey): Promise
   });
 }
 
+export async function clearObjectStore(storeName: string): Promise<void> {
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const req = store.clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
 export async function getSettings(): Promise<ShopSettings> {
   const db = await openDatabase();
   return new Promise((resolve) => {

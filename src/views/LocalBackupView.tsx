@@ -52,6 +52,7 @@ export const LocalBackupView: React.FC<LocalBackupViewProps> = ({
   onSettingsUpdated,
 }) => {
   const [selectedFormat, setSelectedFormat] = useState<'zip' | 'json'>('zip');
+  const [restoreMode, setRestoreMode] = useState<'merge' | 'replace'>('merge');
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [currentFolderName, setCurrentFolderName] = useState(getActiveDirectoryName());
@@ -182,14 +183,14 @@ export const LocalBackupView: React.FC<LocalBackupViewProps> = ({
       text: 'حفاظتی اسنیپ شاٹ محفوظ کر کے ڈیٹا بحال کیا جا رہا ہے...',
     });
 
-    const res = await executeRestoreFromParsedData(restoreModalData.parsedData);
+    const res = await executeRestoreFromParsedData(restoreModalData.parsedData, restoreMode);
     setIsRestoring(false);
 
     if (res.success) {
       setStatusMessage({ type: 'success', text: res.message });
       setSafetyAvailable(true);
       onRefreshAllData();
-      alert('موسی موبائل ریپیئرنگ سینٹر کا تمام ڈیٹا کامیابی کے ساتھ بحال ہو چکا ہے!');
+      alert(`موسی موبائل ریپیئرنگ سینٹر کا تمام ڈیٹا کامیابی کے ساتھ بحال ہو چکا ہے! [طریقہ: ${restoreMode === 'replace' ? 'مکمل تبدیل موڈ' : 'نیا ڈیٹا شامل کریں'}]`);
     } else {
       setStatusMessage({ type: 'error', text: res.message });
     }
@@ -322,16 +323,16 @@ export const LocalBackupView: React.FC<LocalBackupViewProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-white">فعال بیک اپ فولڈر:</span>
+                <span className="text-sm font-black text-white">ایک ہی محفوظ فولڈر:</span>
                 <span className="font-mono text-xs px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-[#d4af37] border border-amber-500/40 font-bold">
-                  📁 MUSA MOBILE BACKUP
+                  📁 MUSA MOBILE COMPLETE BACKUP
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
-                  مسلسل اپڈیٹ موڈ
+                  ONE FOLDER MASTER
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-1" dir="rtl">
-                ہر بیک اپ پر الگ الگ فائلیں نہیں بنیں گی، بلکہ اسی فولڈر کی ماسٹر فائل (MUSA_MOBILE_MASTER_BACKUP) خودکار طور پر اپڈیٹ ہو گی، پرانا ڈیٹا محفوظ رہے گا اور کوئی ڈپلیکیٹ ریکارڈ نہیں بنے گا۔
+                تمام بیک اپ اسی ایک واحد فولڈر (<strong>MUSA MOBILE COMPLETE BACKUP</strong>) میں رہتے ہیں۔ ماسٹر فائل <strong>MUSA_FULL_BACKUP.zip</strong> مسلسل اپڈیٹ ہوتی ہے، جسے آپ دوسرے موبائل میں ڈیٹا منتقل کرنے کے لیے آسانی سے استعمال کر سکتے ہیں۔
               </p>
             </div>
           </div>
@@ -373,15 +374,15 @@ export const LocalBackupView: React.FC<LocalBackupViewProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#d4af37]">
-                Action 1 • Continuous Update
+                Action 1 • Portable Master Backup
               </span>
               <div className="p-2 rounded-xl bg-[#0353a4]/40 text-[#d4af37]">
                 <Download className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-white">مسلسل ماسٹر بیک اپ اپڈیٹ کریں (Update Master Backup)</h3>
+            <h3 className="text-sm font-bold text-white">مکمل ماسٹر بیک اپ بنائیں (MUSA_FULL_BACKUP.zip)</h3>
             <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-              تمام کسٹمرز، رسیدیں، تصاویر اور اکاؤنٹس کو فولڈر <strong className="text-yellow-300">"MUSA MOBILE BACKUP"</strong> میں ماسٹر فائل کے طور پر اپڈیٹ کریں۔
+              تمام کسٹمرز، رسیدیں، تصاویر اور نوٹس کو فولڈر <strong className="text-yellow-300">"MUSA MOBILE COMPLETE BACKUP"</strong> میں سنگل ماسٹر فائل کے طور پر تیار کریں تاکہ دوسرے موبائل میں بھی ٹرانسفر ہو سکے۔
             </p>
 
             {/* Format Selector: ZIP vs JSON */}
@@ -440,7 +441,7 @@ export const LocalBackupView: React.FC<LocalBackupViewProps> = ({
             </div>
             <h3 className="text-sm font-bold text-white">ڈیٹا واپس بحال کریں (Restore Backup)</h3>
             <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-              فولڈر "MUSA MOBILE BACKUP" میں سے ماسٹر فائل منتخب کر کے تمام کسٹمرز اور مرمت کا ریکارڈ فوراً واپس لائیں۔
+              فولڈر "MUSA MOBILE COMPLETE BACKUP" میں سے ماسٹر فائل منتخب کر کے تمام کسٹمرز اور مرمت کا ریکارڈ فوراً واپس لائیں۔
             </p>
 
             <div className="mt-3 p-2 bg-[#030b1e] rounded-xl border border-slate-800 text-[11px] text-emerald-300 flex items-center gap-1.5">
@@ -775,8 +776,55 @@ export const LocalBackupView: React.FC<LocalBackupViewProps> = ({
 
             <div className="space-y-3 text-xs">
               <p className="text-slate-300 leading-relaxed">
-                اس بیک اپ فائل کی تصدیق ہو چکی ہے۔ بحالی کے دوران تمام موجودہ ریکارڈز کو محفوظ رکھتے ہوئے نیا ڈیٹا شامل کیا جائے گا۔
+                اس بیک اپ فائل کی تصدیق ہو چکی ہے۔ براہ کرم بحالی کا طریقہ (Restore Mode) منتخب کریں:
               </p>
+
+              {/* Restore Mode Selector: Merge vs Replace */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRestoreMode('merge')}
+                  className={`p-3 rounded-xl border text-right transition flex flex-col gap-1 cursor-pointer ${
+                    restoreMode === 'merge'
+                      ? 'bg-blue-950/70 border-blue-500 text-white shadow-lg ring-1 ring-blue-500'
+                      : 'bg-[#030b1e] border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-bold text-xs text-blue-300">نیا ڈیٹا شامل کریں (Merge)</span>
+                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                      restoreMode === 'merge' ? 'border-blue-400 bg-blue-500' : 'border-slate-600'
+                    }`}>
+                      {restoreMode === 'merge' && <span className="w-1.5 h-1.5 bg-white rounded-full" />}
+                    </span>
+                  </div>
+                  <p className="text-[10.5px] text-slate-300 leading-relaxed mt-0.5" dir="rtl">
+                    موجودہ کسٹمرز اور ریکارڈز برقرار رہیں گے، بیک اپ فائل کا نیا ڈیٹا ان میں ضم ہو جائے گا۔
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRestoreMode('replace')}
+                  className={`p-3 rounded-xl border text-right transition flex flex-col gap-1 cursor-pointer ${
+                    restoreMode === 'replace'
+                      ? 'bg-amber-950/70 border-amber-500 text-white shadow-lg ring-1 ring-amber-500'
+                      : 'bg-[#030b1e] border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-bold text-xs text-amber-300">مکمل تبدیل کریں (Replace)</span>
+                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                      restoreMode === 'replace' ? 'border-amber-400 bg-amber-500' : 'border-slate-600'
+                    }`}>
+                      {restoreMode === 'replace' && <span className="w-1.5 h-1.5 bg-white rounded-full" />}
+                    </span>
+                  </div>
+                  <p className="text-[10.5px] text-slate-300 leading-relaxed mt-0.5" dir="rtl">
+                    نئے موبائل میں ڈیٹا منتقل کرنے کے لیے۔ پرانا ڈیٹا صاف کر کے صرف بیک اپ کا ڈیٹا بحال کرے گا۔
+                  </p>
+                </button>
+              </div>
 
               {restoreModalData.stats && (
                 <div className="grid grid-cols-2 gap-2 p-3 bg-[#030b1e] rounded-xl border border-slate-800 font-mono text-xs">
