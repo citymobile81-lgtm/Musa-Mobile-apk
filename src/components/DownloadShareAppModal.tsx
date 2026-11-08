@@ -234,7 +234,7 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
               </a>
 
               <a
-                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.0/Musa_Mobile_Repairing_Center.apk"
+                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.1/Musa_Mobile_Repairing_Center.apk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-1.5 bg-[#030b1e] hover:bg-slate-800 border border-indigo-500/40 text-indigo-300 font-semibold rounded-lg text-[10.5px] flex items-center justify-center gap-1.5 transition"

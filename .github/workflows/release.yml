@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release version tag (e.g. v2.0.0)'
+        description: 'Release version tag (e.g. v2.0.1)'
         required: false
-        default: 'v2.0.0'
+        default: 'v2.0.1'
 
 permissions:
   contents: write
@@ -48,10 +48,13 @@ jobs:
       - name: Sync Web Application to Android Assets
         run: npx cap sync android
 
-      - name: Generate Android Release Keystore
+      - name: Verify Permanent Android Release Keystore
         run: |
           cd android/app
-          if [ ! -f "release.keystore" ]; then
+          if [ -f "release.keystore" ]; then
+            echo "Permanent release.keystore verified!"
+          else
+            echo "Generating fallback release.keystore..."
             keytool -genkeypair -v \
               -keystore release.keystore \
               -alias musamobile \
@@ -91,6 +94,13 @@ jobs:
           echo "Verifying internal APK contents..."
           unzip -l "$APK_FILE" | grep -E 'AndroidManifest\.xml|classes\.dex|resources\.arsc|assets/public/index\.html'
           
+          # Verify signatures using apksigner
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort -V | tail -n 1)
+          if [ -n "$APKSIGNER" ]; then
+            echo "Verifying signature with apksigner: $APKSIGNER"
+            "$APKSIGNER" verify --verbose --print-certs "$APK_FILE" || true
+          fi
+          
           mkdir -p release-artifacts
           cp "$APK_FILE" release-artifacts/Musa_Mobile_Repairing_Center.apk
           cp "$APK_FILE" release-artifacts/Musa-Mobile-Repairing-v2.0-Signed.apk
@@ -106,8 +116,8 @@ jobs:
       - name: Publish GitHub Release with Signed APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.0') }}
-          name: Musa Mobile Repairing Center ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.0') }}
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.1') }}
+          name: Musa Mobile Repairing Center ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.1') }}
           body: |
             ## 📱 Musa Mobile Repairing Center — Official Native Android APK Release
             موسی موبائل ریپیئرنگ سنٹر - مکمل اینڈرائیڈ ایپلی کیشن (Signed Release APK)

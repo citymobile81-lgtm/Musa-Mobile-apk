@@ -7,8 +7,8 @@ android {
         applicationId "com.musamobile.repairing"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 200
-        versionName "2.0.0"
+        versionCode 201
+        versionName "2.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -22,21 +22,13 @@ android {
     }
     signingConfigs {
         release {
-            if (project.hasProperty('RELEASE_STORE_FILE') && file(RELEASE_STORE_FILE).exists()) {
-                storeFile file(RELEASE_STORE_FILE)
-                storePassword RELEASE_STORE_PASSWORD
-                keyAlias RELEASE_KEY_ALIAS
-                keyPassword RELEASE_KEY_PASSWORD
-            } else if (file('release.keystore').exists()) {
-                storeFile file('release.keystore')
-                storePassword 'musamobile'
-                keyAlias 'musamobile'
-                keyPassword 'musamobile'
-            } else {
-                initWith(signingConfigs.debug)
-            }
+            storeFile file('release.keystore')
+            storePassword 'musamobile'
+            keyAlias 'musamobile'
+            keyPassword 'musamobile'
             v1SigningEnabled true
             v2SigningEnabled true
+            v3SigningEnabled true
         }
     }
     buildTypes {
