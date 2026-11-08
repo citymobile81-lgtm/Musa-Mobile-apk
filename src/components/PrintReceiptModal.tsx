@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { JobCard, ShopSettings } from '../types';
 import { RotatingLogo } from './RotatingLogo';
-import { SHOP_PERSONNEL, SHOP_LOCATION } from '../data/shopContacts';
-import { Printer, Share2, X, Download, QrCode } from 'lucide-react';
+import { SHOP_PERSONNEL } from '../data/shopContacts';
+import { Printer, Share2, X, Download, Image as ImageIcon, Loader2, Check } from 'lucide-react';
 import QRCode from 'qrcode';
+import { generateReceiptImageCard } from '../services/receiptImageGenerator';
 
 interface PrintReceiptModalProps {
   job: JobCard | null;
@@ -17,9 +18,16 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
   onClose,
 }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (!job) return;
+
+    // Reset state on job change
+    setImagePreviewUrl(null);
+    setShareFeedback(null);
 
     // Build structured verification text for the QR Code
     const qrData = JSON.stringify({
@@ -57,38 +65,104 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
     window.print();
   };
 
-  const handleWhatsAppShare = () => {
-    let cleanPhone = job.customerPhone.replace(/[^0-9]/g, '');
-    if (cleanPhone.startsWith('03')) {
-      cleanPhone = '92' + cleanPhone.substring(1);
+  /**
+   * Generates genuine PNG receipt card and shares it directly as an image file on WhatsApp
+   * using Web Share API (native on Android/iOS/Windows).
+   * If direct image file sharing is not supported by the browser or user cancels,
+   * it automatically downloads the image card to device and opens customer's WhatsApp chat.
+   */
+  const handleWhatsAppImageShare = async () => {
+    if (!job) return;
+    setIsGeneratingImage(true);
+    setShareFeedback(null);
+
+    try {
+      const { blob, fileName, dataUrl } = await generateReceiptImageCard({ job, settings });
+      setImagePreviewUrl(dataUrl);
+
+      let cleanPhone = job.customerPhone.replace(/[^0-9]/g, '');
+      if (cleanPhone.startsWith('03')) {
+        cleanPhone = '92' + cleanPhone.substring(1);
+      } else if (cleanPhone.startsWith('0')) {
+        cleanPhone = '92' + cleanPhone.substring(1);
+      }
+
+      const totalBill = job.cost ?? job.estimatedCost ?? 0;
+      const advance = job.advancePaid || 0;
+      const balance = job.balance ?? (totalBill - advance);
+
+      const captionText =
+        `*موسیٰ موبائل ریپیئرنگ سنٹر - رسید کارڈ*\n` +
+        `*Job No:* #${job.jobId || job.jobCardNumber}\n` +
+        `*Customer:* ${job.customerName}\n` +
+        `*Device:* ${job.company} ${job.model}\n` +
+        `*Remaining Balance:* PKR ${balance.toLocaleString()}\n` +
+        `شکریہ! موسیٰ موبائل ریپیئرنگ سنٹر، واٹر پلانٹ نزد قبا آپٹیکل، مظفرگڑھ سٹی\n` +
+        `📞 پروپرائیٹر (03006861765) | 📞 لیب انجینئر (03216861765)`;
+
+      const imageFile = new File([blob], fileName, { type: 'image/png' });
+
+      // Check if Web Share API can share image files (supported on modern Android Chrome/WebView)
+      if (navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+        try {
+          await navigator.share({
+            files: [imageFile],
+            title: `Musa Mobile Receipt #${job.jobId || job.jobCardNumber}`,
+            text: captionText,
+          });
+          setShareFeedback('تصویری رسید کامیابی سے شیئر ہو گئی!');
+          setIsGeneratingImage(false);
+          return;
+        } catch (shareErr: unknown) {
+          // If user aborted or share failed, fallback to save image + open WhatsApp
+          if ((shareErr as { name?: string })?.name !== 'AbortError') {
+            console.warn('Native image share did not complete, falling back', shareErr);
+          }
+        }
+      }
+
+      // Fallback: Trigger instant download of the PNG receipt card and open WhatsApp chat
+      triggerDownload(dataUrl, fileName);
+
+      setShareFeedback('رسید تصویر محفوظ ہو گئی! WhatsApp کھولا جا رہا ہے...');
+      const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(captionText)}`;
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+      }, 700);
+
+    } catch (err) {
+      console.error('Error generating WhatsApp receipt image', err);
+      setShareFeedback('تصویر بنانے میں مسئلہ آیا۔ دوبارہ کوشش کریں۔');
+    } finally {
+      setIsGeneratingImage(false);
     }
+  };
 
-    const totalBill = job.estimatedCost || job.cost || 0;
-    const balanceDue = job.balance ?? (totalBill - (job.advancePaid || 0));
+  /**
+   * Helper to download the PNG receipt card directly
+   */
+  const handleDownloadImageCard = async () => {
+    if (!job) return;
+    setIsGeneratingImage(true);
+    try {
+      const { dataUrl, fileName } = await generateReceiptImageCard({ job, settings });
+      setImagePreviewUrl(dataUrl);
+      triggerDownload(dataUrl, fileName);
+      setShareFeedback('رسید کی تصویری فائل (PNG) ڈاؤن لوڈ ہو گئی!');
+    } catch (err) {
+      console.error('Download image card error', err);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
 
-    const message =
-      `*${settings.shopName || 'MUSA MOBILE REPAIRING CENTER'}*\n` +
-      `*${settings.shopUrdu || 'موسیٰ موبائل ریپیئرنگ سنٹر'}*\n` +
-      `--------------------------------\n` +
-      `*Job Card No:* ${job.jobId || job.jobCardNumber}\n` +
-      `*Customer Name:* ${job.customerName}\n` +
-      `*Device:* ${job.company} ${job.model} (${job.color || 'Standard'})\n` +
-      `*IMEI:* ${job.imei1 || 'N/A'}\n` +
-      `*Reported Fault:* ${job.fault || job.issue}\n` +
-      `*Total Estimate:* PKR ${totalBill.toLocaleString()}\n` +
-      `*Advance Paid:* PKR ${(job.advancePaid || 0).toLocaleString()}\n` +
-      `*Remaining Balance:* PKR ${balanceDue.toLocaleString()}\n` +
-      `*Expected Delivery:* ${job.deliveryDate || 'Within 24 Hours'}\n` +
-      `*Status:* ${job.status}\n` +
-      `--------------------------------\n` +
-      `پتہ: بالمقابل قبا آپٹیکل، واٹر پلانٹ والی گلی، مظفرگڑھ\n` +
-      `رابطہ نمبرز:\n` +
-      `📞 ${SHOP_PERSONNEL.mohsin.nameUrdu} (پروپرائیٹر): ${SHOP_PERSONNEL.mohsin.phone}\n` +
-      `📞 ${SHOP_PERSONNEL.azhar.nameUrdu} (لیب انجینئر): ${SHOP_PERSONNEL.azhar.phone}\n` +
-      `شکریہ! موسیٰ موبائل ریپیئرنگ سنٹر`;
-
-    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+  const triggerDownload = (url: string, filename: string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const totalBill = job.estimatedCost || job.cost || 0;
@@ -101,22 +175,35 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
         {/* Modal Controls (Hidden in Print) */}
         <div className="no-print flex items-center justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-700">
-              <Printer className="w-4 h-4" />
+            <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
+              <ImageIcon className="w-4 h-4" />
             </span>
-            <h3 className="text-sm font-bold text-slate-900">
-              Official Customer Job Card Receipt & Scannable QR
-            </h3>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                Official Job Card Receipt & WhatsApp Image Card
+              </h3>
+              <p className="text-[10px] text-slate-500 font-serif">
+                موسیٰ موبائل ریپیئرنگ سنٹر - تصویری رسید و انوائس
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* PRINTABLE RECEIPT TEMPLATE */}
+        {/* Status notification banner if any */}
+        {shareFeedback && (
+          <div className="no-print p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2">
+            <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{shareFeedback}</span>
+          </div>
+        )}
+
+        {/* PRINTABLE RECEIPT TEMPLATE (Used for Paper/Thermal Printer & PDF) */}
         <div
           id="printable-receipt"
           className="p-4 border-2 border-slate-900 rounded-xl bg-white text-black font-sans text-xs space-y-3"
@@ -144,12 +231,12 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
             </p>
             {/* Strictly Authorized Contact Numbers */}
             <div className="mt-1 flex flex-wrap items-center justify-center gap-3 font-mono text-[10px] font-bold text-slate-900">
-              <span className="inline-flex items-center gap-1">📞 پروپرائیٹر: <span dir="ltr">{SHOP_PERSONNEL.mohsin.phone}</span></span>
+              <span className="inline-flex items-center gap-1">📞 پروپرائیٹر: <span dir="ltr">03006861765</span></span>
               <span>•</span>
-              <span className="inline-flex items-center gap-1">📞 لیب انجینئر: <span dir="ltr">{SHOP_PERSONNEL.azhar.phone}</span></span>
+              <span className="inline-flex items-center gap-1">📞 لیب انجینئر: <span dir="ltr">03216861765</span></span>
             </div>
             <p className="text-[9px] text-slate-600 font-serif font-bold mt-0.5">
-              پروپرائیٹر: {SHOP_PERSONNEL.mohsin.nameUrdu} | چیف لیب انجینئر: {SHOP_PERSONNEL.azhar.nameUrdu}
+              پروپرائیٹر: میاں محمد محسن قریشی | چیف لیب انجینئر: میاں اظہر قریشی
             </p>
           </div>
 
@@ -310,47 +397,77 @@ export const PrintReceiptModal: React.FC<PrintReceiptModalProps> = ({
             </p>
           </div>
 
-          {/* Signatures */}
-          <div className="grid grid-cols-2 gap-6 pt-3 text-[10px] text-center">
-            <div>
-              <div className="h-5" />
-              <p className="border-t border-dashed border-slate-800 font-semibold pt-1">
-                Customer Signature
-              </p>
-            </div>
-            <div>
-              <div className="h-5" />
-              <p className="border-t border-dashed border-slate-800 font-semibold pt-1">
-                Musa Mobile Authorized
-              </p>
-            </div>
+          {/* Bottom Card Signature */}
+          <div className="pt-2 text-center border-t border-slate-200">
+            <p className="text-[11px] font-serif font-bold text-slate-900">
+              "آپ کے اعتماد کا شکریہ، موسی موبائل ریپیئرنگ سنٹر"
+            </p>
           </div>
         </div>
 
+        {/* Small Image Preview if generated */}
+        {imagePreviewUrl && (
+          <div className="no-print p-2 rounded-xl bg-slate-900 text-white flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <img src={imagePreviewUrl} alt="Preview" className="w-10 h-14 object-cover rounded border border-amber-400" />
+              <div>
+                <p className="font-bold text-amber-300">WhatsApp تصویری رسید تیار ہے</p>
+                <p className="text-[10px] text-slate-400">High-Resolution PNG Card</p>
+              </div>
+            </div>
+            <button
+              onClick={handleDownloadImageCard}
+              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] flex items-center gap-1 transition"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>محفوظ کریں</span>
+            </button>
+          </div>
+        )}
+
         {/* Modal Buttons (Hidden in Print) */}
         <div className="no-print pt-2 flex flex-wrap items-center justify-between gap-2">
-          <button
-            onClick={handleWhatsAppShare}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow transition"
-          >
-            <Share2 className="w-4 h-4" />
-            <span>Send on WhatsApp</span>
-          </button>
+          {/* Main Action: Send Genuine WhatsApp Image Card */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleWhatsAppImageShare}
+              disabled={isGeneratingImage}
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-green-600/25 transition cursor-pointer disabled:opacity-60"
+            >
+              {isGeneratingImage ? (
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+              ) : (
+                <Share2 className="w-4 h-4 text-amber-300" />
+              )}
+              <span>WhatsApp پر تصویری رسید بھیجیں</span>
+            </button>
 
+            <button
+              onClick={handleDownloadImageCard}
+              disabled={isGeneratingImage}
+              className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+              title="Save Image Card directly (PNG)"
+            >
+              <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
+              <span>Save Image</span>
+            </button>
+          </div>
+
+          {/* Existing Print & PDF Buttons */}
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow transition"
+              className="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer"
             >
-              <Download className="w-4 h-4" />
-              <span>PDF / Print</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>PDF</span>
             </button>
             <button
               onClick={handlePrint}
-              className="px-5 py-2 bg-[#0466c8] hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-500/20 transition"
+              className="px-4 py-2.5 bg-[#0466c8] hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-blue-500/20 transition cursor-pointer"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print Invoice</span>
+              <Printer className="w-3.5 h-3.5" />
+              <span>پرنٹ رسید</span>
             </button>
           </div>
         </div>

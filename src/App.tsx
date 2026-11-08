@@ -101,6 +101,16 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isUrdu, setIsUrdu] = useState(false);
 
+  /**
+   * Seamlessly switches view and automatically closes the navigation drawer
+   * on all devices (mobile, tablet, and desktop) for unobstructed full-screen experience.
+   */
+  const navigateToView = (view: string) => {
+    setCurrentView(view);
+    // Auto-close menu navigation on selection
+    setSidebarOpen(false);
+  };
+
   const [themeSuccessNotification, setThemeSuccessNotification] = useState<string | null>(null);
 
   const handleSelectTheme = (newTheme: AppThemeId) => {
@@ -561,7 +571,7 @@ export default function App() {
               </p>
               <nav className="space-y-1">
                 <button
-                  onClick={() => setCurrentView('dashboard')}
+                  onClick={() => navigateToView('dashboard')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'dashboard'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -573,7 +583,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('newRepair')}
+                  onClick={() => navigateToView('newRepair')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'newRepair'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -585,7 +595,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('jobCards')}
+                  onClick={() => navigateToView('jobCards')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'jobCards'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -597,7 +607,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('udhar')}
+                  onClick={() => navigateToView('udhar')}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'udhar'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -614,7 +624,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('reminders')}
+                  onClick={() => navigateToView('reminders')}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'reminders'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -633,7 +643,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('repairReports')}
+                  onClick={() => navigateToView('repairReports')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'repairReports'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -653,7 +663,7 @@ export default function App() {
               </p>
               <nav className="space-y-1">
                 <button
-                  onClick={() => setCurrentView('customers')}
+                  onClick={() => navigateToView('customers')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'customers'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -665,7 +675,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('customerPayments')}
+                  onClick={() => navigateToView('customerPayments')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'customerPayments'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -685,7 +695,7 @@ export default function App() {
               </p>
               <nav className="space-y-1">
                 <button
-                  onClick={() => setCurrentView('inventory')}
+                  onClick={() => navigateToView('inventory')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'inventory'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -697,7 +707,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('partsPurchase')}
+                  onClick={() => navigateToView('partsPurchase')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'partsPurchase'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -709,7 +719,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('partsSales')}
+                  onClick={() => navigateToView('partsSales')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'partsSales'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -729,7 +739,7 @@ export default function App() {
               </p>
               <nav className="space-y-1">
                 <button
-                  onClick={() => setCurrentView('expenses')}
+                  onClick={() => navigateToView('expenses')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'expenses'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -741,7 +751,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('reports')}
+                  onClick={() => navigateToView('reports')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'reports'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -753,7 +763,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('warranty')}
+                  onClick={() => navigateToView('warranty')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'warranty'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -773,7 +783,7 @@ export default function App() {
               </p>
               <nav className="space-y-1">
                 <button
-                  onClick={() => setCurrentView('employees')}
+                  onClick={() => navigateToView('employees')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'employees'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -795,7 +805,7 @@ export default function App() {
               <nav className="space-y-1">
 
                 <button
-                  onClick={() => setCurrentView('localBackup')}
+                  onClick={() => navigateToView('localBackup')}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'localBackup'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -812,7 +822,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('gdriveSync')}
+                  onClick={() => navigateToView('gdriveSync')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'gdriveSync'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -824,7 +834,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('settings')}
+                  onClick={() => navigateToView('settings')}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'settings'
                       ? 'bg-[#0353a4]/50 text-white border-l-4 border-[#d4af37]'
@@ -836,7 +846,7 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('themes')}
+                  onClick={() => navigateToView('themes')}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition ${
                     currentView === 'themes'
                       ? 'bg-yellow-500 text-black font-bold'
@@ -854,6 +864,7 @@ export default function App() {
 
                 <button
                   onClick={() => {
+                    setSidebarOpen(false);
                     logoutUser();
                     setIsAuth(false);
                   }}
@@ -885,6 +896,15 @@ export default function App() {
 
           </div>
         </aside>
+
+        {/* MOBILE BACKDROP OVERLAY TO AUTO-CLOSE MENU DRAWER WHEN TAPPING OUTSIDE */}
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 z-10 lg:hidden backdrop-blur-xs transition-opacity duration-300"
+            aria-hidden="true"
+          />
+        )}
 
         {/* MAIN ROUTE CONTENT VIEW */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
