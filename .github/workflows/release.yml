@@ -92,13 +92,14 @@ jobs:
           unzip -l "$APK_FILE" | grep -E 'AndroidManifest\.xml|classes\.dex|resources\.arsc|assets/public/index\.html'
           
           mkdir -p release-artifacts
+          cp "$APK_FILE" release-artifacts/Musa_Mobile_Repairing_Center.apk
           cp "$APK_FILE" release-artifacts/Musa-Mobile-Repairing-v2.0-Signed.apk
           cp "$APK_FILE" release-artifacts/musa-mobile.apk
 
       - name: Upload APK as GitHub Actions Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Musa-Mobile-Release-APK
+          name: Musa_Mobile_Repairing_Center
           path: release-artifacts/*.apk
           retention-days: 30
 
@@ -112,13 +113,15 @@ jobs:
             موسی موبائل ریپیئرنگ سنٹر - مکمل اینڈرائیڈ ایپلی کیشن (Signed Release APK)
 
             ### 🚀 Direct Installation on Android:
-            - **Musa-Mobile-Repairing-v2.0-Signed.apk**: Genuine compiled native Android APK package (Capacitor Android Runtime with Dalvik/Dex bytecode and compiled resources).
+            - **Musa_Mobile_Repairing_Center.apk**: Genuine compiled native Android APK package (Capacitor Android Runtime with Dalvik/Dex bytecode and compiled resources).
+            - **Musa-Mobile-Repairing-v2.0-Signed.apk**: Alternate signed release asset.
             - **No Parsing Errors**: Fully compiled binary `AndroidManifest.xml`, `classes.dex`, `resources.arsc`, and signed with v1/v2 signatures.
             - **Universal Compatibility**: Minimum Android 7.0 (API 24) to Android 15 (API 36).
 
             ### ✨ Included Features:
             - **6 Professional Themes**: Including Theme 6 (Premium Pure White Theme), Black & Gold, Royal Blue, Gradient, Dark Neon, and Green Luxury.
             - **Smart Customer Auto Search**: Instant search across Name, Phone, IMEI, and Model.
+            - **41 Mobile Accessories**: Interactive Multi-Select Dropdown with live search.
             - **Job Cards & Repair Progress**: Live percentage indicators and fault checklists.
             - **Thermal Receipts**: 80mm POS receipt generator.
             - **Udhar Khata**: Complete balance and payments tracking.
@@ -126,6 +129,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
+            release-artifacts/Musa_Mobile_Repairing_Center.apk
             release-artifacts/Musa-Mobile-Repairing-v2.0-Signed.apk
             release-artifacts/musa-mobile.apk
         env:
