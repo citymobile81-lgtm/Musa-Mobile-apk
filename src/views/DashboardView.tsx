@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Customer, JobCard, SparePart, Expense, ShopSettings } from '../types';
 import { RotatingLogo } from '../components/RotatingLogo';
+import { RepairStatusSummaryWidget } from '../components/RepairStatusSummaryWidget';
 import { SHOP_PERSONNEL } from '../data/shopContacts';
 import {
   Users,
@@ -219,6 +220,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Repair Status Summary Widget (Operational Overview) */}
+      <RepairStatusSummaryWidget
+        jobs={jobs}
+        onNavigate={onNavigate}
+      />
 
       {/* 10 Dashboard Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
