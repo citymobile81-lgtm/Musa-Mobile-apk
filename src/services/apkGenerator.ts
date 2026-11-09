@@ -2,16 +2,16 @@ import JSZip from 'jszip';
 
 export const OFFICIAL_APK_INFO = {
   fileName: 'Musa_Mobile_Repairing_Center.apk',
-  version: 'v2.0.2',
-  sizeBytes: 3950000,
-  sizeMB: '3.8 MB',
+  version: 'v2.0.3',
+  sizeBytes: 4018419,
+  sizeMB: '3.83 MB',
   packageId: 'com.musamobile.repairing',
   minSdk: 'Android 7.0 (API 24)',
   targetSdk: 'Android 15 (API 35)',
-  signature: 'Digitally Signed (Permanent RSA 2048-bit v1 + v2)',
+  signature: 'Digitally Signed (Permanent RSA 2048-bit v2 + v3)',
   localDownloadPath: '/Musa_Mobile_Repairing_Center.apk',
   directReleaseUrl:
-    'https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.2/Musa_Mobile_Repairing_Center.apk',
+    'https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.3/Musa_Mobile_Repairing_Center.apk',
 };
 
 /**

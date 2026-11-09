@@ -225,7 +225,7 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
 
             <div className="space-y-1.5">
               <a
-                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.2/Musa_Mobile_Repairing_Center.apk"
+                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/download/v2.0.3/Musa_Mobile_Repairing_Center.apk"
                 download="Musa_Mobile_Repairing_Center.apk"
                 className="w-full py-2.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
               >
@@ -234,13 +234,13 @@ export const DownloadShareAppModal: React.FC<DownloadShareAppModalProps> = ({
               </a>
 
               <a
-                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/tag/v2.0.2"
+                href="https://github.com/citymobile81-lgtm/Musa-Mobile-apk/releases/tag/v2.0.3"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-1.5 bg-[#030b1e] hover:bg-slate-800 border border-indigo-500/40 text-indigo-300 font-semibold rounded-lg text-[10.5px] flex items-center justify-center gap-1.5 transition"
               >
                 <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
-                <span>GitHub Releases Portal (v2.0.2)</span>
+                <span>GitHub Releases Portal (v2.0.3)</span>
               </a>
 
               {/* Secondary PWA Install option */}

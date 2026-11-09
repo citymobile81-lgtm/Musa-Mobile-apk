@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+*.apk
+public/*.apk
+android/app/src/main/assets/public/

@@ -5,32 +5,9 @@ import fs from 'fs';
 import {defineConfig, Plugin} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
 
-function serveApkPlugin(): Plugin {
-  return {
-    name: 'serve-apk',
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (req.url && (req.url.startsWith('/Musa-Mobile-Repairing-v2.0.apk') || req.url.endsWith('.apk'))) {
-          const filePath = path.resolve('public', 'Musa-Mobile-Repairing-v2.0.apk');
-          if (fs.existsSync(filePath)) {
-            res.setHeader('Content-Type', 'application/vnd.android.package-archive');
-            res.setHeader('Content-Disposition', 'attachment; filename="Musa-Mobile-Repairing-v2.0.apk"');
-            res.setHeader('Content-Length', fs.statSync(filePath).size);
-            fs.createReadStream(filePath).pipe(res);
-            return;
-          }
-        }
-        next();
-      });
-    },
-  };
-}
-
 export default defineConfig(() => {
   return {
-    assetsInclude: ['**/*.apk'],
     plugins: [
-      serveApkPlugin(),
       react(),
       tailwindcss(),
       VitePWA({

@@ -124,41 +124,57 @@ jobs:
           cp "$SIGNED_APK" release-artifacts/Musa-Mobile-Repairing-v2.0-Signed.apk
           cp "$SIGNED_APK" release-artifacts/musa-mobile.apk
 
+      - name: Package Full Source Code ZIP
+        run: |
+          python3 -c "
+          import os, zipfile
+          with zipfile.ZipFile('release-artifacts/Musa_Mobile_Repairing_Center_Source_v2.0.3.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+              for root, dirs, files in os.walk('.'):
+                  dirs[:] = [d for d in dirs if d not in {'node_modules', 'dist', '.git', 'build', '.gradle', 'release-artifacts'}]
+                  for f in files:
+                      if not f.endswith('.apk') and not f.endswith('.zip'):
+                          fp = os.path.join(root, f)
+                          z.write(fp, os.path.relpath(fp, '.'))
+          "
+          ls -lh release-artifacts/
+
       - name: Upload APK as GitHub Actions Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Musa_Mobile_Repairing_Center
-          path: release-artifacts/*.apk
+          path: release-artifacts/*
           retention-days: 30
 
       - name: Publish GitHub Release with Signed APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.1') }}
-          name: Musa Mobile Repairing Center ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.1') }}
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.3') }}
+          name: Musa Mobile Repairing Center ${{ github.ref_type == 'tag' && github.ref_name || (inputs.release_tag || 'v2.0.3') }}
           body: |
-            ## 📱 Musa Mobile Repairing Center — Official Native Android APK Release
-            موسی موبائل ریپیئرنگ سنٹر - مکمل اینڈرائیڈ ایپلی کیشن (Signed Release APK)
+            ## 📱 Musa Mobile Repairing Center — Official Universal Native Android APK Release (v2.0.3)
+            موسی موبائل ریپیئرنگ سنٹر - مکمل اینڈرائیڈ ایپلی کیشن (Signed Universal Release APK)
 
             ### 🚀 Direct Installation on Android:
-            - **Musa_Mobile_Repairing_Center.apk**: Genuine compiled native Android APK package (Capacitor Android Runtime with Dalvik/Dex bytecode and compiled resources).
-            - **Musa-Mobile-Repairing-v2.0-Signed.apk**: Alternate signed release asset.
-            - **No Parsing Errors**: Fully compiled binary `AndroidManifest.xml`, `classes.dex`, `resources.arsc`, and signed with v1/v2 signatures.
-            - **Universal Compatibility**: Minimum Android 7.0 (API 24) to Android 15 (API 36).
+            - **Musa_Mobile_Repairing_Center.apk**: Clean, verified universal native Android APK package (Capacitor Android Runtime with Dalvik/Dex bytecode and compiled resources).
+            - **Universal Compatibility**: Compatible with Android 7.0 (API 24) through Android 8, 9, 10, 11, 12, 13, 14, 15, and 16.
+            - **All CPU Architectures**: ARM64 (arm64-v8a), ARMv7 (armeabi-v7a), and x86_64.
+            - **Zero Corrupted Files**: 100% clean asset tree with no nested APK files.
+            - **Verified Signatures**: Official Android SDK `apksigner` verified with APK Signature Schemes V2 and V3.
 
             ### ✨ Included Features:
-            - **6 Professional Themes**: Including Theme 6 (Premium Pure White Theme), Black & Gold, Royal Blue, Gradient, Dark Neon, and Green Luxury.
+            - **6 Professional Themes**: Pure White, Black & Gold, Royal Blue, Gradient, Dark Neon, and Green Luxury.
             - **Smart Customer Auto Search**: Instant search across Name, Phone, IMEI, and Model.
             - **41 Mobile Accessories**: Interactive Multi-Select Dropdown with live search.
             - **Job Cards & Repair Progress**: Live percentage indicators and fault checklists.
             - **Thermal Receipts**: 80mm POS receipt generator.
             - **Udhar Khata**: Complete balance and payments tracking.
-            - **Camera & Storage Integration**: Take device intake photos and export database backups.
+            - **Camera & Storage Integration**: Intake photos and full database export/restore.
           draft: false
           prerelease: false
           files: |
             release-artifacts/Musa_Mobile_Repairing_Center.apk
             release-artifacts/Musa-Mobile-Repairing-v2.0-Signed.apk
             release-artifacts/musa-mobile.apk
+            release-artifacts/Musa_Mobile_Repairing_Center_Source_v2.0.3.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
