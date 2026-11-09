@@ -39,7 +39,7 @@ jobs:
       - name: Install Node Dependencies
         run: |
           npm install --legacy-peer-deps
-          npm install --no-save @rollup/rollup-linux-x64-gnu
+          npm install --legacy-peer-deps --no-save @rollup/rollup-linux-x64-gnu || true
 
       - name: Validate TypeScript Code
         run: npm run lint
