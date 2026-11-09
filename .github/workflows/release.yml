@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release version tag (e.g. v2.0.1)'
+        description: 'Release version tag (e.g. v2.0.2)'
         required: false
-        default: 'v2.0.1'
+        default: 'v2.0.2'
 
 permissions:
   contents: write
@@ -43,10 +43,14 @@ jobs:
         run: npm run lint
 
       - name: Build Web Application
-        run: npm run build
+        run: |
+          rm -f public/*.apk
+          npm run build
 
       - name: Sync Web Application to Android Assets
-        run: npx cap sync android
+        run: |
+          npx cap sync android
+          rm -f android/app/src/main/assets/public/*.apk
 
       - name: Verify Permanent Android Release Keystore
         run: |
